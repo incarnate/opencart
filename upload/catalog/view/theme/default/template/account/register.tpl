@@ -82,9 +82,6 @@
             <label class="col-sm-2 control-label" for="input-fax"><?php echo $entry_fax; ?></label>
             <div class="col-sm-10">
               <input type="text" name="fax" value="<?php echo $fax; ?>" placeholder="<?php echo $entry_fax; ?>" id="input-fax" class="form-control" />
-              <?php if ($error_fax) { ?>
-              <div class="text-danger"><?php echo $error_fax; ?></div>
-              <?php } ?>
             </div>
           </div>
         </fieldset>
@@ -383,7 +380,7 @@ $('select[name=\'country_id\']').on('change', function() {
 		url: 'index.php?route=account/account/country&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
-			$('select[name=\'country_id\']').after(' <i class="fa fa-cog fa-spin"></i>');
+			$('select[name=\'country_id\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
 		},
 		complete: function() {
 			$('.fa-spin').remove();
@@ -474,7 +471,7 @@ $('button[id^=\'button-custom-field\']').on('click', function() {
 			contentType: false,
 			processData: false,
 			beforeSend: function() {
-				$(node).find('i').replaceWith('<i class="fa fa-cog fa-spin"></i>');
+				$(node).find('i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
 				$(node).prop('disabled', true);
 			},
 			complete: function() {

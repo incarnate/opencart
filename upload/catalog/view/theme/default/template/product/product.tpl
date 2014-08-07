@@ -511,7 +511,7 @@ $('button[id^=\'button-upload\']').on('click', function() {
 			contentType: false,
 			processData: false,
 			beforeSend: function() {
-				$(node).find('i').replaceWith('<i class="fa fa-cog fa-spin"></i>');
+				$(node).find('i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
 				$(node).prop('disabled', true);
 			},
 			complete: function() {
@@ -562,7 +562,7 @@ $('#button-review').on('click', function() {
 		},
 		complete: function() {
 			$('#button-review').button('reset');
-			$('#captcha').attr('src', 'index.php?route=tool/captcha');
+			$('#captcha').attr('src', 'index.php?route=tool/captcha#'+new Date().getTime());
 			$('input[name=\'captcha\']').val('');
 		},
 		success: function(json) {

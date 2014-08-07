@@ -1545,88 +1545,6 @@ class ControllerSaleOrder extends Controller {
 		$this->response->setOutput($this->load->view('sale/order_history.tpl', $data));
 	}
 
-	public function upload() {
-		$this->load->language('sale/order');
-
-		$json = array();
-
-		// Check user has permission
-		if (!$this->user->hasPermission('modify', 'sale/order')) {
-			$json['error'] = $this->language->get('error_permission');
-		}
-
-		if (!$json) {
-			if (!empty($this->request->files['file']['name']) && is_file($this->request->files['file']['tmp_name'])) {
-				// Sanitize the filename
-				$filename = html_entity_decode($this->request->files['file']['name'], ENT_QUOTES, 'UTF-8');
-
-				if ((utf8_strlen($filename) < 3) || (utf8_strlen($filename) > 128)) {
-					$json['error'] = $this->language->get('error_filename');
-				}
-
-				// Allowed file extension types
-				$allowed = array();
-
-				$extension_allowed = preg_replace('~\r?\n~', "\n", $this->config->get('config_file_ext_allowed'));
-
-				$filetypes = explode("\n", $extension_allowed);
-
-				foreach ($filetypes as $filetype) {
-					$allowed[] = trim($filetype);
-				}
-
-				if (!in_array(strtolower(substr(strrchr($filename, '.'), 1)), $allowed)) {
-					$json['error'] = $this->language->get('error_filetype');
-				}
-
-				// Allowed file mime types
-				$allowed = array();
-
-				$mime_allowed = preg_replace('~\r?\n~', "\n", $this->config->get('config_file_mime_allowed'));
-
-				$filetypes = explode("\n", $mime_allowed);
-
-				foreach ($filetypes as $filetype) {
-					$allowed[] = trim($filetype);
-				}
-
-				if (!in_array($this->request->files['file']['type'], $allowed)) {
-					$json['error'] = $this->language->get('error_filetype');
-				}
-
-				// Check to see if any PHP files are trying to be uploaded
-				$content = file_get_contents($this->request->files['file']['tmp_name']);
-
-				if (preg_match('/\<\?php/i', $content)) {
-					$json['error'] = $this->language->get('error_filetype');
-				}
-
-				// Return any upload error
-				if ($this->request->files['file']['error'] != UPLOAD_ERR_OK) {
-					$json['error'] = $this->language->get('error_upload_' . $this->request->files['file']['error']);
-				}
-			} else {
-				$json['error'] = $this->language->get('error_upload');
-			}
-		}
-
-		if (!$json) {
-			$file = $filename . '.' . md5(mt_rand());
-
-			move_uploaded_file($this->request->files['file']['tmp_name'], DIR_DOWNLOAD . $file);
-
-			// Hide the uploaded file name so people can not link to it directly.
-			$this->load->model('tool/upload');
-
-			$json['code'] = $this->model_tool_upload->addUpload($filename, $file);
-
-			$json['success'] = $this->language->get('text_upload');
-		}
-
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
-	}
-
 	public function invoice() {
 		$this->load->language('sale/order');
 
@@ -2054,20 +1972,52 @@ class ControllerSaleOrder extends Controller {
 	}
 			
 	public function api() {
-		print_r($this->request->post);
-		
-		/*
 		$json = array();
 		
 		if (!$this->user->hasPermission('modify', 'sale/order')) {
 			$json['error'] = $this->language->get('error_permission');
 		}		
 		
+		// Create a cookie if one does not exist
 		if (!isset($this->session->data['cookie'])) {
-			$json['error'] = $this->language->get('error_login');
+			$this->load->model('user/api');
+		
+			$api_info = $this->model_user_api->getApi($this->config->get('config_api_id'));
+		
+			if ($api_info) {
+				$url = HTTPS_CATALOG . 'index.php?route=api/login';
+				
+				$curl = curl_init();
+				
+				// Set SSL if required
+				if (substr($url, 0, 5) == 'https') {
+					curl_setopt($curl, CURLOPT_PORT, 443);
+				}
+				
+				curl_setopt($curl, CURLOPT_HEADER, false);
+				curl_setopt($curl, CURLINFO_HEADER_OUT, true);
+				curl_setopt($curl, CURLOPT_USERAGENT, $this->request->server['HTTP_USER_AGENT']);
+				curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+				curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false); 
+				curl_setopt($curl, CURLOPT_FORBID_REUSE, false);
+				curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($curl, CURLOPT_URL, $url);
+				curl_setopt($curl, CURLOPT_POST, true);
+				curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($api_info));
+				
+				$response = curl_exec($curl);
+		
+				if (!$response) {
+					$response = json_encode(array('error' => curl_error($curl) . '(' . curl_errno($curl) . ')'));
+				} else {
+					$json = $response;	
+				}			
+			}
 		}	
 			
-		if (!isset($this->request->get['api'])) {
+		if (isset($this->request->get['api'])) {
+			$url = 'index.php?route=' . $this->request->get['api'];
+		} else {
 			$json['error'] = $this->language->get('error_api');
 		}
 						
@@ -2093,9 +2043,7 @@ class ControllerSaleOrder extends Controller {
 				curl_setopt($curl, CURLOPT_POSTFIELDS, http_build_query($this->request->post));
 			}
 			
-			if (isset($this->request->get['cookie'])) {
-				curl_setopt($curl, CURLOPT_COOKIE, session_name() . '=' . $this->request->get['cookie'] . ';');
-			}
+			curl_setopt($curl, CURLOPT_COOKIE, session_name() . '=' . $this->session->data['cookie'] . ';');
 			
 			$response = curl_exec($curl);
 	
@@ -2110,6 +2058,5 @@ class ControllerSaleOrder extends Controller {
 		
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
-		*/
 	}
 }
