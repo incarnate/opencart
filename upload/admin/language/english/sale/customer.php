@@ -1,14 +1,16 @@
 <?php
 // Heading
-$_['heading_title']         = 'Customer';
+$_['heading_title']         = 'Customers';
 
 // Text
 $_['text_success']          = 'Success: You have modified customers!';
+$_['text_list']             = 'Customer List';
+$_['text_add']              = 'Add Customer';
+$_['text_edit']             = 'Edit Customer';
 $_['text_default']          = 'Default';
 $_['text_balance']          = 'Balance';
 $_['text_add_ban_ip']       = 'Add Ban IP';
 $_['text_remove_ban_ip']    = 'Remove Ban IP';
-$_['text_login']            = 'Login into Store';
 
 // Column
 $_['column_name']           = 'Customer Name';
@@ -33,6 +35,7 @@ $_['entry_telephone']       = 'Telephone';
 $_['entry_fax']             = 'Fax';
 $_['entry_newsletter']      = 'Newsletter';
 $_['entry_status']          = 'Status';
+$_['entry_approved']        = 'Approved';
 $_['entry_safe']            = 'Safe';
 $_['entry_password']        = 'Password';
 $_['entry_confirm']         = 'Confirm';
@@ -49,7 +52,6 @@ $_['entry_description']     = 'Description';
 $_['entry_amount']          = 'Amount';
 $_['entry_points']          = 'Points';
 $_['entry_name']            = 'Customer Name';
-$_['entry_approved']        = 'Approved';
 $_['entry_ip']              = 'IP';
 $_['entry_date_added']      = 'Date Added';
 

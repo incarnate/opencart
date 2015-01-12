@@ -1,7 +1,7 @@
 <?php
 class ModelAccountCustomer extends Model {
 	public function addCustomer($data) {
-		$this->event->trigger('pre_customer_add');
+		$this->event->trigger('pre.customer.add', $data);
 
 		if (isset($data['customer_group_id']) && is_array($this->config->get('config_customer_group_display')) && in_array($data['customer_group_id'], $this->config->get('config_customer_group_display'))) {
 			$customer_group_id = $data['customer_group_id'];
@@ -67,40 +67,42 @@ class ModelAccountCustomer extends Model {
 			$emails = explode(',', $this->config->get('config_mail_alert'));
 
 			foreach ($emails as $email) {
-				if (utf8_strlen($email) > 0 && preg_match('/^[^\@]+@.*\.[a-z]{2,6}$/i', $email)) {
+				if (utf8_strlen($email) > 0 && preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $email)) {
 					$mail->setTo($email);
 					$mail->send();
 				}
 			}
 		}
 
-		$this->event->trigger('customer_add', array('customer_id' => $customer_id));
+		$this->event->trigger('post.customer.add', $customer_id);
 
 		return $customer_id;
 	}
 
 	public function editCustomer($data) {
-		$this->event->trigger('pre_customer_edit');
+		$this->event->trigger('pre.customer.edit', $data);
 
-		$this->db->query("UPDATE " . DB_PREFIX . "customer SET firstname = '" . $this->db->escape($data['firstname']) . "', lastname = '" . $this->db->escape($data['lastname']) . "', email = '" . $this->db->escape($data['email']) . "', telephone = '" . $this->db->escape($data['telephone']) . "', fax = '" . $this->db->escape($data['fax']) . "', custom_field = '" . $this->db->escape(isset($data['custom_field']) ? serialize($data['custom_field']) : '') . "' WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+		$customer_id = $this->customer->getId();
 
-		$this->event->trigger('customer_edit');
+		$this->db->query("UPDATE " . DB_PREFIX . "customer SET firstname = '" . $this->db->escape($data['firstname']) . "', lastname = '" . $this->db->escape($data['lastname']) . "', email = '" . $this->db->escape($data['email']) . "', telephone = '" . $this->db->escape($data['telephone']) . "', fax = '" . $this->db->escape($data['fax']) . "', custom_field = '" . $this->db->escape(isset($data['custom_field']) ? serialize($data['custom_field']) : '') . "' WHERE customer_id = '" . (int)$customer_id . "'");
+
+		$this->event->trigger('post.customer.edit', $customer_id);
 	}
 
 	public function editPassword($email, $password) {
-		$this->event->trigger('pre_customer_edit_password');
+		$this->event->trigger('pre.customer.edit.password');
 
 		$this->db->query("UPDATE " . DB_PREFIX . "customer SET salt = '" . $this->db->escape($salt = substr(md5(uniqid(rand(), true)), 0, 9)) . "', password = '" . $this->db->escape(sha1($salt . sha1($salt . sha1($password)))) . "' WHERE LOWER(email) = '" . $this->db->escape(utf8_strtolower($email)) . "'");
 
-		$this->event->trigger('customer_edit_password');
+		$this->event->trigger('post.customer.edit.password');
 	}
 
 	public function editNewsletter($newsletter) {
-		$this->event->trigger('pre_customer_edit_newsletter');
+		$this->event->trigger('pre.customer.edit.newsletter');
 
 		$this->db->query("UPDATE " . DB_PREFIX . "customer SET newsletter = '" . (int)$newsletter . "' WHERE customer_id = '" . (int)$this->customer->getId() . "'");
 
-		$this->event->trigger('customer_edit_newsletter');
+		$this->event->trigger('post.customer.edit.newsletter');
 	}
 
 	public function getCustomer($customer_id) {
@@ -140,4 +142,24 @@ class ModelAccountCustomer extends Model {
 
 		return $query->num_rows;
 	}
+	
+	public function addLoginAttempt($email) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "customer_login WHERE email = '" . $this->db->escape(utf8_strtolower((string)$email)) . "' AND ip = '" . $this->db->escape($this->request->server['REMOTE_ADDR']) . "'");
+		
+		if (!$query->num_rows) {
+			$this->db->query("INSERT INTO " . DB_PREFIX . "customer_login SET email = '" . $this->db->escape(utf8_strtolower((string)$email)) . "', ip = '" . $this->db->escape($this->request->server['REMOTE_ADDR']) . "', total = 1, date_added = '" . $this->db->escape(date('Y-m-d H:i:s')) . "', date_modified = '" . $this->db->escape(date('Y-m-d H:i:s')) . "'");
+		} else {
+			$this->db->query("UPDATE " . DB_PREFIX . "customer_login SET total = (total + 1), date_modified = '" . $this->db->escape(date('Y-m-d H:i:s')) . "' WHERE customer_login_id = '" . (int)$query->row['customer_login_id'] . "'");
+		}			
+	}	
+	
+	public function getLoginAttempts($email) {
+		$query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "customer_login` WHERE email = '" . $this->db->escape(utf8_strtolower($email)) . "'");
+
+		return $query->row;
+	}
+	
+	public function deleteLoginAttempts($email) {
+		$this->db->query("DELETE FROM `" . DB_PREFIX . "customer_login` WHERE email = '" . $this->db->escape(utf8_strtolower($email)) . "'");
+	}	
 }

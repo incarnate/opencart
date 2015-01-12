@@ -50,8 +50,6 @@ class ModelShippingUsps extends Model {
 
 				// Calculate girth based on usps calculation
 				$xml .= '		<Girth>' . (round(((float)$this->config->get('usps_length') + (float)$this->config->get('usps_width') * 2 + (float)$this->config->get('usps_height') * 2), 1)) . '</Girth>';
-
-
 				$xml .=	'		<Machinable>' . ($this->config->get('usps_machinable') ? 'true' : 'false') . '</Machinable>';
 				$xml .=	'	</Package>';
 				$xml .= '</RateV4Request>';
@@ -350,7 +348,7 @@ class ModelShippingUsps extends Model {
 					$firstclasses = array (
 						'First-Class Mail Parcel',
 						'First-Class Mail Large Envelope',
-						'First-Class Mail Letter',
+						'First-Class Mail Stamped Letter',
 						'First-Class Mail Postcards'
 					);
 

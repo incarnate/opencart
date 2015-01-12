@@ -20,8 +20,6 @@ class ControllerCheckoutCart extends Controller {
 		if ($this->cart->hasProducts() || !empty($this->session->data['vouchers'])) {
 			$data['heading_title'] = $this->language->get('heading_title');
 
-			$data['text_recurring'] = $this->language->get('text_recurring');
-			$data['text_length'] = $this->language->get('text_length');
 			$data['text_recurring_item'] = $this->language->get('text_recurring_item');
 			$data['text_next'] = $this->language->get('text_next');
 			$data['text_next_choice'] = $this->language->get('text_next_choice');
@@ -62,7 +60,7 @@ class ControllerCheckoutCart extends Controller {
 				$data['success'] = '';
 			}
 
-			$data['action'] = $this->url->link('checkout/cart/update');
+			$data['action'] = $this->url->link('checkout/cart/edit');
 
 			if ($this->config->get('config_cart_weight')) {
 				$data['weight'] = $this->weight->format($this->cart->getWeight(), $this->config->get('config_weight_class_id'), $this->language->get('decimal_point'), $this->language->get('thousand_point'));
@@ -149,7 +147,7 @@ class ControllerCheckoutCart extends Controller {
 					if ($product['recurring']['duration']) {
 						$recurring .= sprintf($this->language->get('text_payment_description'), $this->currency->format($this->tax->calculate($product['recurring']['price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax'))), $product['recurring']['cycle'], $frequencies[$product['recurring']['frequency']], $product['recurring']['duration']);
 					} else {
-						$recurring .= sprintf($this->language->get('text_payment_until_canceled_description'), $this->currency->format($this->tax->calculate($product['recurring']['price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax'))), $product['recurring']['cycle'], $frequencies[$product['recurring']['frequency']], $product['recurring']['duration']);
+						$recurring .= sprintf($this->language->get('text_payment_cancel'), $this->currency->format($this->tax->calculate($product['recurring']['price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax'))), $product['recurring']['cycle'], $frequencies[$product['recurring']['frequency']], $product['recurring']['duration']);
 					}
 				}
 
@@ -184,7 +182,7 @@ class ControllerCheckoutCart extends Controller {
 			}
 
 			// Totals
-			$this->load->model('setting/extension');
+			$this->load->model('extension/extension');
 
 			$total_data = array();
 			$total = 0;
@@ -194,7 +192,7 @@ class ControllerCheckoutCart extends Controller {
 			if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
 				$sort_order = array();
 
-				$results = $this->model_setting_extension->getExtensions('total');
+				$results = $this->model_extension_extension->getExtensions('total');
 
 				foreach ($results as $key => $value) {
 					$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
@@ -232,7 +230,7 @@ class ControllerCheckoutCart extends Controller {
 
 			$data['checkout'] = $this->url->link('checkout/checkout', '', 'SSL');
 
-			$this->load->model('setting/extension');
+			$this->load->model('extension/extension');
 
 			$data['checkout_buttons'] = array();
 
@@ -284,7 +282,7 @@ class ControllerCheckoutCart extends Controller {
 		$json = array();
 
 		if (isset($this->request->post['product_id'])) {
-			$product_id = $this->request->post['product_id'];
+			$product_id = (int)$this->request->post['product_id'];
 		} else {
 			$product_id = 0;
 		}
@@ -294,8 +292,10 @@ class ControllerCheckoutCart extends Controller {
 		$product_info = $this->model_catalog_product->getProduct($product_id);
 
 		if ($product_info) {
-			if (!isset($this->request->post['quantity']) || empty($this->request->post['quantity']) || $this->request->post['quantity'] < 1) {
-				$json['error']['quantity'] = $this->language->get('error_quantity');
+			if (isset($this->request->post['quantity'])) {
+				$quantity = (int)$this->request->post['quantity'];
+			} else {
+				$quantity = 1;
 			}
 
 			if (isset($this->request->post['option'])) {
@@ -312,28 +312,28 @@ class ControllerCheckoutCart extends Controller {
 				}
 			}
 
-			if (isset($this->request->post['profile_id'])) {
-				$profile_id = $this->request->post['profile_id'];
+			if (isset($this->request->post['recurring_id'])) {
+				$recurring_id = $this->request->post['recurring_id'];
 			} else {
-				$profile_id = 0;
+				$recurring_id = 0;
 			}
 
-			$profiles = $this->model_catalog_product->getProfiles($product_info['product_id']);
+			$recurrings = $this->model_catalog_product->getProfiles($product_info['product_id']);
 
-			if ($profiles) {
-				$profile_ids = array();
+			if ($recurrings) {
+				$recurring_ids = array();
 
-				foreach ($profiles as $profile) {
-					$profile_ids[] = $profile['profile_id'];
+				foreach ($recurrings as $recurring) {
+					$recurring_ids[] = $recurring['recurring_id'];
 				}
 
-				if (!in_array($profile_id, $profile_ids)) {
-					$json['error']['profile'] = $this->language->get('error_profile_required');
+				if (!in_array($recurring_id, $recurring_ids)) {
+					$json['error']['recurring'] = $this->language->get('error_recurring_required');
 				}
 			}
 
 			if (!$json) {
-				$this->cart->add($this->request->post['product_id'], $this->request->post['quantity'], $option, $profile_id);
+				$this->cart->add($this->request->post['product_id'], $this->request->post['quantity'], $option, $recurring_id);
 
 				$json['success'] = sprintf($this->language->get('text_success'), $this->url->link('product/product', 'product_id=' . $this->request->post['product_id']), $product_info['name'], $this->url->link('checkout/cart'));
 
@@ -343,7 +343,7 @@ class ControllerCheckoutCart extends Controller {
 				unset($this->session->data['payment_methods']);
 
 				// Totals
-				$this->load->model('setting/extension');
+				$this->load->model('extension/extension');
 
 				$total_data = array();
 				$total = 0;
@@ -353,7 +353,7 @@ class ControllerCheckoutCart extends Controller {
 				if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
 					$sort_order = array();
 
-					$results = $this->model_setting_extension->getExtensions('total');
+					$results = $this->model_extension_extension->getExtensions('total');
 
 					foreach ($results as $key => $value) {
 						$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
@@ -388,7 +388,7 @@ class ControllerCheckoutCart extends Controller {
 		$this->response->setOutput(json_encode($json));
 	}
 
-	public function update() {
+	public function edit() {
 		$this->load->language('checkout/cart');
 
 		$json = array();
@@ -421,7 +421,7 @@ class ControllerCheckoutCart extends Controller {
 		if (isset($this->request->post['key'])) {
 			$this->cart->remove($this->request->post['key']);
 
-			unset($this->session->data['vouchers']);
+			unset($this->session->data['vouchers'][$this->request->post['key']]);
 
 			$this->session->data['success'] = $this->language->get('text_remove');
 
@@ -432,7 +432,7 @@ class ControllerCheckoutCart extends Controller {
 			unset($this->session->data['reward']);
 
 			// Totals
-			$this->load->model('setting/extension');
+			$this->load->model('extension/extension');
 
 			$total_data = array();
 			$total = 0;
@@ -442,7 +442,7 @@ class ControllerCheckoutCart extends Controller {
 			if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
 				$sort_order = array();
 
-				$results = $this->model_setting_extension->getExtensions('total');
+				$results = $this->model_extension_extension->getExtensions('total');
 
 				foreach ($results as $key => $value) {
 					$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');

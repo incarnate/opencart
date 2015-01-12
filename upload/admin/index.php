@@ -1,6 +1,6 @@
 <?php
 // Version
-define('VERSION', '2.0.0.0a1');
+define('VERSION', '2.0.1.2_rc');
 
 // Configuration
 if (is_file('config.php')) {
@@ -54,10 +54,10 @@ function error_handler($errno, $errstr, $errfile, $errline) {
 	global $log, $config;
 
 	// error suppressed with @
-	if (error_reporting() === 0) { 
-		return false; 
-	} 
-	
+	if (error_reporting() === 0) {
+		return false;
+	}
+
 	switch ($errno) {
 		case E_NOTICE:
 		case E_USER_NOTICE:
@@ -120,7 +120,7 @@ $config->set('config_language_id', $languages[$config->get('config_admin_languag
 
 // Language
 $language = new Language($languages[$config->get('config_admin_language')]['directory']);
-$language->load($languages[$config->get('config_admin_language')]['filename']);
+$language->load($languages[$config->get('config_admin_language')]['directory']);
 $registry->set('language', $language);
 
 // Document
@@ -138,8 +138,18 @@ $registry->set('length', new Length($registry));
 // User
 $registry->set('user', new User($registry));
 
+//OpenBay Pro
+$registry->set('openbay', new Openbay($registry));
+
 // Event
-$registry->set('event', new Event($registry));
+$event = new Event($registry);
+$registry->set('event', $event);
+
+$query = $db->query("SELECT * FROM " . DB_PREFIX . "event");
+
+foreach ($query->rows as $result) {
+	$event->register($result['trigger'], $result['action']);
+}
 
 // Front Controller
 $controller = new Front($registry);
