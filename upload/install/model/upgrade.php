@@ -20,7 +20,7 @@ class ModelUpgrade extends Model {
 		// Get only the create statements
 		foreach($lines as $line) {
 			// Set any prefix
-			$line = str_replace("CREATE TABLE `oc_", "CREATE TABLE `" . DB_PREFIX, $line);
+			$line = str_replace("CREATE TABLE IF NOT EXISTS `oc_", "CREATE TABLE IF NOT EXISTS `" . DB_PREFIX, $line);
 
 			// If line begins with create table we want to start recording
 			if (substr($line, 0, 12) == 'CREATE TABLE') {
@@ -120,7 +120,7 @@ class ModelUpgrade extends Model {
 			}
 
 			// Get Table Name
-			preg_match_all('#create\s*table\s*`(\w[\w\d]*)`#i', $sql, $table);
+			preg_match_all('#create\s*table\s*if\s*not\s*exists\s*`(\w[\w\d]*)`#i', $sql, $table);
 
 			if (isset($table[1][0])) {
 				$table_new_data[] = array(
@@ -319,11 +319,11 @@ class ModelUpgrade extends Model {
 
 		// Set defaults for new voucher min/max fields if not set
 		if (empty($settings['config_voucher_min'])) {
-			$this->db->query("INSERT INTO `" . DB_PREFIX . "setting` SET `value` = '1', `key` = 'config_voucher_min', `group` = 'config', `store_id` = 0");
+			$this->db->query("INSERT INTO `" . DB_PREFIX . "setting` SET `value` = '1', `key` = 'config_voucher_min', `code` = 'config', `store_id` = 0");
 		}
 
 		if (empty($settings['config_voucher_max'])) {
-			$this->db->query("INSERT INTO `" . DB_PREFIX . "setting` SET `value` = '1000', `key` = 'config_voucher_max', `group` = 'config', `store_id` = 0");
+			$this->db->query("INSERT INTO `" . DB_PREFIX . "setting` SET `value` = '1000', `key` = 'config_voucher_max', `code` = 'config', `store_id` = 0");
 		}
 
 		// Update the customer group table

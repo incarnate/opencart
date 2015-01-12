@@ -17,6 +17,7 @@ class ControllerMarketingContact extends Controller {
 		$data['text_affiliate_all'] = $this->language->get('text_affiliate_all');
 		$data['text_affiliate'] = $this->language->get('text_affiliate');
 		$data['text_product'] = $this->language->get('text_product');
+		$data['text_loading'] = $this->language->get('text_loading');
 
 		$data['entry_store'] = $this->language->get('entry_store');
 		$data['entry_to'] = $this->language->get('entry_to');
@@ -56,10 +57,10 @@ class ControllerMarketingContact extends Controller {
 
 		$this->load->model('sale/customer_group');
 
-		$data['customer_groups'] = $this->model_sale_customer_group->getCustomerGroups(0);
+		$data['customer_groups'] = $this->model_sale_customer_group->getCustomerGroups();
 
 		$data['header'] = $this->load->controller('common/header');
-		$data['menu'] = $this->load->controller('common/menu');
+		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('marketing/contact.tpl', $data));
@@ -231,7 +232,7 @@ class ControllerMarketingContact extends Controller {
 					$message .= '</html>' . "\n";
 
 					foreach ($emails as $email) {
-						if (preg_match('/^[^\@]+@.*\.[a-z]{2,6}$/i', $email)) {
+						if (preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $email)) {
 							$mail = new Mail($this->config->get('config_mail'));
 							$mail->setTo($email);
 							$mail->setFrom($this->config->get('config_email'));

@@ -81,7 +81,7 @@ class ControllerCheckoutGuestShipping extends Controller {
 		// Custom Fields
 		$this->load->model('account/custom_field');
 
-		$data['custom_fields'] = $this->model_account_custom_field->getCustomFields(array('filter_customer_group_id' => $this->session->data['guest']['customer_group_id']));
+		$data['custom_fields'] = $this->model_account_custom_field->getCustomFields($this->session->data['guest']['customer_group_id']);
 
 		if (isset($this->session->data['shipping_address']['custom_field'])) {
 			$data['address_custom_field'] = $this->session->data['shipping_address']['custom_field'];
@@ -152,19 +152,19 @@ class ControllerCheckoutGuestShipping extends Controller {
 			// Custom field validation
 			$this->load->model('account/custom_field');
 
-			$custom_fields = $this->model_account_custom_field->getCustomFields(array('filter_customer_group_id' => $this->session->data['guest']['customer_group_id']));
+			$custom_fields = $this->model_account_custom_field->getCustomFields($this->session->data['guest']['customer_group_id']);
 
 			foreach ($custom_fields as $custom_field) {
 				if (($custom_field['location'] == 'address') && $custom_field['required'] && empty($this->request->post['custom_field'][$custom_field['custom_field_id']])) {
-					$json['error']['custom_field'][$custom_field['custom_field_id']] = sprintf($this->language->get('error_custom_field'), $custom_field['name']);
+					$json['error']['custom_field' . $custom_field['custom_field_id']] = sprintf($this->language->get('error_custom_field'), $custom_field['name']);
 				}
 			}
 		}
 
 		if (!$json) {
-			$this->session->data['shipping_address']['firstname'] = trim($this->request->post['firstname']);
-			$this->session->data['shipping_address']['lastname'] = trim($this->request->post['lastname']);
-			$this->session->data['shipping_address']['company'] = trim($this->request->post['company']);
+			$this->session->data['shipping_address']['firstname'] = $this->request->post['firstname'];
+			$this->session->data['shipping_address']['lastname'] = $this->request->post['lastname'];
+			$this->session->data['shipping_address']['company'] = $this->request->post['company'];
 			$this->session->data['shipping_address']['address_1'] = $this->request->post['address_1'];
 			$this->session->data['shipping_address']['address_2'] = $this->request->post['address_2'];
 			$this->session->data['shipping_address']['postcode'] = $this->request->post['postcode'];

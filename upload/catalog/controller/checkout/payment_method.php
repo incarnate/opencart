@@ -4,15 +4,37 @@ class ControllerCheckoutPaymentMethod extends Controller {
 		$this->load->language('checkout/checkout');
 
 		if (isset($this->session->data['payment_address'])) {
-			// Selected payment methods should be from cart sub total not total! 
-			$total = $this->cart->getSubTotal();
+			// Totals
+			$total_data = array();
+			$total = 0;
+			$taxes = $this->cart->getTaxes();
+
+			$this->load->model('extension/extension');
+
+			$sort_order = array();
+
+			$results = $this->model_extension_extension->getExtensions('total');
+
+			foreach ($results as $key => $value) {
+				$sort_order[$key] = $this->config->get($value['code'] . '_sort_order');
+			}
+
+			array_multisort($sort_order, SORT_ASC, $results);
+
+			foreach ($results as $result) {
+				if ($this->config->get($result['code'] . '_status')) {
+					$this->load->model('total/' . $result['code']);
+
+					$this->{'model_total_' . $result['code']}->getTotal($total_data, $total, $taxes);
+				}
+			}
 
 			// Payment Methods
 			$method_data = array();
 
-			$this->load->model('setting/extension');
+			$this->load->model('extension/extension');
 
-			$results = $this->model_setting_extension->getExtensions('payment');
+			$results = $this->model_extension_extension->getExtensions('payment');
 
 			$recurring = $this->cart->hasRecurringProducts();
 
@@ -153,7 +175,7 @@ class ControllerCheckoutPaymentMethod extends Controller {
 				$json['error']['warning'] = sprintf($this->language->get('error_agree'), $information_info['title']);
 			}
 		}
-			
+
 		if (!$json) {
 			$this->session->data['payment_method'] = $this->session->data['payment_methods'][$this->request->post['payment_method']];
 

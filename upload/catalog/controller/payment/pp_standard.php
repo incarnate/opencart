@@ -29,11 +29,15 @@ class ControllerPaymentPPStandard extends Controller {
 
 				foreach ($product['option'] as $option) {
 					if ($option['type'] != 'file') {
-						$value = $option['option_value'];
+						$value = $option['value'];
 					} else {
-						$filename = $this->encryption->decrypt($option['option_value']);
-
-						$value = utf8_substr($filename, 0, utf8_strrpos($filename, '.'));
+						$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
+						
+						if ($upload_info) {
+							$value = $upload_info['name'];
+						} else {
+							$value = '';
+						}
 					}
 
 					$option_data[] = array(
@@ -151,18 +155,19 @@ class ControllerPaymentPPStandard extends Controller {
 						break;
 					case 'Completed':
 						$receiver_match = (strtolower($this->request->post['receiver_email']) == strtolower($this->config->get('pp_standard_email')));
-						
+
 						$total_paid_match = ((float)$this->request->post['mc_gross'] == $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false));
-						
+
 						if ($receiver_match && $total_paid_match) {
 							$order_status_id = $this->config->get('pp_standard_completed_status_id');
-						} else {
-							if (!$receiver_match) {
-								$this->log->write('PP_STANDARD :: RECEIVER EMAIL MISMATCH! ' . strtolower($this->request->post['receiver_email']));
-							}
-							if (!$total_paid_match) {
-								$this->log->write('PP_STANDARD :: TOTAL PAID MISMATCH! ' . $this->request->post['mc_gross']);
-							}
+						}
+						
+						if (!$receiver_match) {
+							$this->log->write('PP_STANDARD :: RECEIVER EMAIL MISMATCH! ' . strtolower($this->request->post['receiver_email']));
+						}
+						
+						if (!$total_paid_match) {
+							$this->log->write('PP_STANDARD :: TOTAL PAID MISMATCH! ' . $this->request->post['mc_gross']);
 						}
 						break;
 					case 'Denied':

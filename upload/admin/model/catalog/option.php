@@ -1,6 +1,8 @@
 <?php
 class ModelCatalogOption extends Model {
 	public function addOption($data) {
+		$this->event->trigger('pre.admin.option.add', $data);
+
 		$this->db->query("INSERT INTO `" . DB_PREFIX . "option` SET type = '" . $this->db->escape($data['type']) . "', sort_order = '" . (int)$data['sort_order'] . "'");
 
 		$option_id = $this->db->getLastId();
@@ -21,12 +23,14 @@ class ModelCatalogOption extends Model {
 			}
 		}
 
-		$this->event->trigger('admin_add_option', array('option_id' => $option_id));
+		$this->event->trigger('post.admin.option.add', $option_id);
 
 		return $option_id;
 	}
 
 	public function editOption($option_id, $data) {
+		$this->event->trigger('pre.admin.option.edit', $data);
+
 		$this->db->query("UPDATE `" . DB_PREFIX . "option` SET type = '" . $this->db->escape($data['type']) . "', sort_order = '" . (int)$data['sort_order'] . "' WHERE option_id = '" . (int)$option_id . "'");
 
 		$this->db->query("DELETE FROM " . DB_PREFIX . "option_description WHERE option_id = '" . (int)$option_id . "'");
@@ -55,16 +59,18 @@ class ModelCatalogOption extends Model {
 
 		}
 
-		$this->event->trigger('admin_edit_option');
+		$this->event->trigger('post.admin.option.edit', $option_id);
 	}
 
 	public function deleteOption($option_id) {
+		$this->event->trigger('pre.admin.option.delete', $option_id);
+
 		$this->db->query("DELETE FROM `" . DB_PREFIX . "option` WHERE option_id = '" . (int)$option_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "option_description WHERE option_id = '" . (int)$option_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "option_value WHERE option_id = '" . (int)$option_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "option_value_description WHERE option_id = '" . (int)$option_id . "'");
 
-		$this->event->trigger('admin_delete_option');
+		$this->event->trigger('post.admin.option.delete', $option_id);
 	}
 
 	public function getOption($option_id) {
@@ -76,7 +82,7 @@ class ModelCatalogOption extends Model {
 	public function getOptions($data = array()) {
 		$sql = "SELECT * FROM `" . DB_PREFIX . "option` o LEFT JOIN " . DB_PREFIX . "option_description od ON (o.option_id = od.option_id) WHERE od.language_id = '" . (int)$this->config->get('config_language_id') . "'";
 
-		if (isset($data['filter_name']) && $data['filter_name'] !== null) {
+		if (!empty($data['filter_name'])) {
 			$sql .= " AND od.name LIKE '" . $this->db->escape($data['filter_name']) . "%'";
 		}
 

@@ -81,7 +81,8 @@ class ControllerProductSpecial extends Controller {
 		$data['button_compare'] = $this->language->get('button_compare');
 		$data['button_list'] = $this->language->get('button_list');
 		$data['button_grid'] = $this->language->get('button_grid');
-
+		$data['button_continue'] = $this->language->get('button_continue');
+		
 		$data['compare'] = $this->url->link('product/compare');
 
 		$data['products'] = array();
@@ -256,6 +257,8 @@ class ControllerProductSpecial extends Controller {
 		$data['sort'] = $sort;
 		$data['order'] = $order;
 		$data['limit'] = $limit;
+
+		$data['continue'] = $this->url->link('common/home');
 
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['column_right'] = $this->load->controller('common/column_right');

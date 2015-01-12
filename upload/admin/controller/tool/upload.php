@@ -3,14 +3,14 @@ class ControllerToolUpload extends Controller {
 	private $error = array();
 
 	public function index() {
-		  $this->load->language('tool/upload');
+		$this->load->language('tool/upload');
 
-		  $this->document->setTitle($this->language->get('heading_title'));
+		$this->document->setTitle($this->language->get('heading_title'));
 
-		  $this->load->model('tool/upload');
+		$this->load->model('tool/upload');
 
-		  $this->getList();
-	 }
+		$this->getList();
+	}
 
 	public function delete() {
 		$this->load->language('tool/upload');
@@ -25,7 +25,7 @@ class ControllerToolUpload extends Controller {
 				$upload_info = $this->model_tool_upload->getUpload($upload_id);
 
 				if ($upload_info && is_file(DIR_DOWNLOAD . $upload_info['filename'])) {
-					unlink(DIR_DOWNLOAD . $upload_info['filename']);
+					unlink(DIR_UPLOAD . $upload_info['filename']);
 				}
 
 				$this->model_tool_upload->deleteUpload($upload_id);
@@ -154,7 +154,8 @@ class ControllerToolUpload extends Controller {
 		}
 
 		$data['heading_title'] = $this->language->get('heading_title');
-
+		
+		$data['text_list'] = $this->language->get('text_list');
 		$data['text_no_results'] = $this->language->get('text_no_results');
 		$data['text_confirm'] = $this->language->get('text_confirm');
 
@@ -234,7 +235,7 @@ class ControllerToolUpload extends Controller {
 
 		$data['pagination'] = $pagination->render();
 
-		$data['results'] = sprintf($this->language->get('text_pagination'), ($upload_total) ? (($page - 1) * $this->config->get('config_limit_admin')) + 1 : 0, ((($page - 1) * $this->config->get('config_limit_admin')) > ($upload_total - $this->config->get('config_limit_admin'))) ? $upload_total : ((($page - 1) * $this->config->get('config_limit_admin')) + $this->config->get('config_limit_admin')), $upload_total, $upload_total, ceil($upload_total / $this->config->get('config_limit_admin')));
+		$data['results'] = sprintf($this->language->get('text_pagination'), ($upload_total) ? (($page - 1) * $this->config->get('config_limit_admin')) + 1 : 0, ((($page - 1) * $this->config->get('config_limit_admin')) > ($upload_total - $this->config->get('config_limit_admin'))) ? $upload_total : ((($page - 1) * $this->config->get('config_limit_admin')) + $this->config->get('config_limit_admin')), $upload_total, ceil($upload_total / $this->config->get('config_limit_admin')));
 
 		$data['filter_name'] = $filter_name;
 		$data['filter_date_added'] = $filter_date_added;
@@ -243,7 +244,7 @@ class ControllerToolUpload extends Controller {
 		$data['order'] = $order;
 
 		$data['header'] = $this->load->controller('common/header');
-		$data['menu'] = $this->load->controller('common/menu');
+		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('tool/upload.tpl', $data));
@@ -269,7 +270,7 @@ class ControllerToolUpload extends Controller {
 		$upload_info = $this->model_tool_upload->getUploadByCode($code);
 
 		if ($upload_info) {
-			$file = DIR_DOWNLOAD . $upload_info['filename'];
+			$file = DIR_UPLOAD . $upload_info['filename'];
 			$mask = basename($upload_info['name']);
 
 			if (!headers_sent()) {
@@ -313,10 +314,92 @@ class ControllerToolUpload extends Controller {
 			);
 
 			$data['header'] = $this->load->controller('common/header');
-			$data['menu'] = $this->load->controller('common/menu');
+			$data['column_left'] = $this->load->controller('common/column_left');
 			$data['footer'] = $this->load->controller('common/footer');
 
 			$this->response->setOutput($this->load->view('error/not_found.tpl', $data));
 		}
+	}
+
+	public function upload() {
+		$this->load->language('sale/order');
+
+		$json = array();
+
+		// Check user has permission
+		if (!$this->user->hasPermission('modify', 'tool/upload')) {
+			$json['error'] = $this->language->get('error_permission');
+		}
+
+		if (!$json) {
+			if (!empty($this->request->files['file']['name']) && is_file($this->request->files['file']['tmp_name'])) {
+				// Sanitize the filename
+				$filename = html_entity_decode($this->request->files['file']['name'], ENT_QUOTES, 'UTF-8');
+
+				if ((utf8_strlen($filename) < 3) || (utf8_strlen($filename) > 128)) {
+					$json['error'] = $this->language->get('error_filename');
+				}
+
+				// Allowed file extension types
+				$allowed = array();
+
+				$extension_allowed = preg_replace('~\r?\n~', "\n", $this->config->get('config_file_ext_allowed'));
+
+				$filetypes = explode("\n", $extension_allowed);
+
+				foreach ($filetypes as $filetype) {
+					$allowed[] = trim($filetype);
+				}
+
+				if (!in_array(strtolower(substr(strrchr($filename, '.'), 1)), $allowed)) {
+					$json['error'] = $this->language->get('error_filetype');
+				}
+
+				// Allowed file mime types
+				$allowed = array();
+
+				$mime_allowed = preg_replace('~\r?\n~', "\n", $this->config->get('config_file_mime_allowed'));
+
+				$filetypes = explode("\n", $mime_allowed);
+
+				foreach ($filetypes as $filetype) {
+					$allowed[] = trim($filetype);
+				}
+
+				if (!in_array($this->request->files['file']['type'], $allowed)) {
+					$json['error'] = $this->language->get('error_filetype');
+				}
+
+				// Check to see if any PHP files are trying to be uploaded
+				$content = file_get_contents($this->request->files['file']['tmp_name']);
+
+				if (preg_match('/\<\?php/i', $content)) {
+					$json['error'] = $this->language->get('error_filetype');
+				}
+
+				// Return any upload error
+				if ($this->request->files['file']['error'] != UPLOAD_ERR_OK) {
+					$json['error'] = $this->language->get('error_upload_' . $this->request->files['file']['error']);
+				}
+			} else {
+				$json['error'] = $this->language->get('error_upload');
+			}
+		}
+
+		if (!$json) {
+			$file = $filename . '.' . md5(mt_rand());
+
+			move_uploaded_file($this->request->files['file']['tmp_name'], DIR_UPLOAD . $file);
+
+			// Hide the uploaded file name so people can not link to it directly.
+			$this->load->model('tool/upload');
+
+			$json['code'] = $this->model_tool_upload->addUpload($filename, $file);
+
+			$json['success'] = $this->language->get('text_upload');
+		}
+
+		$this->response->addHeader('Content-Type: application/json');
+		$this->response->setOutput(json_encode($json));
 	}
 }

@@ -7,6 +7,8 @@ class ControllerAccountLogin extends Controller {
 
 		// Login override for admin users
 		if (!empty($this->request->get['token'])) {
+			$this->event->trigger('pre.customer.login');
+
 			$this->customer->logout();
 			$this->cart->clear();
 
@@ -38,7 +40,7 @@ class ControllerAccountLogin extends Controller {
 					$this->session->data['shipping_address'] = $this->model_account_address->getAddress($this->customer->getAddressId());
 				}
 
-				$this->event->trigger('customer_login');
+				$this->event->trigger('post.customer.login');
 
 				$this->response->redirect($this->url->link('account/account', '', 'SSL'));
 			}
@@ -172,20 +174,30 @@ class ControllerAccountLogin extends Controller {
 	}
 
 	protected function validate() {
-		if (!$this->customer->login($this->request->post['email'], $this->request->post['password'])) {
-			$this->error['warning'] = $this->language->get('error_login');
+		// Check how many login attempts have been made.
+		$login_info = $this->model_account_customer->getLoginAttempts($this->request->post['email']);
+				
+		if ($login_info && ($login_info['total'] > $this->config->get('config_login_attempts')) && strtotime('-1 hour') < strtotime($login_info['date_modified'])) {
+			$this->error['warning'] = $this->language->get('error_attempts');
 		}
-
+		
+		// Check if customer has been approved.
 		$customer_info = $this->model_account_customer->getCustomerByEmail($this->request->post['email']);
 
 		if ($customer_info && !$customer_info['approved']) {
 			$this->error['warning'] = $this->language->get('error_approved');
 		}
-
+		
 		if (!$this->error) {
-			return true;
-		} else {
-			return false;
+			if (!$this->customer->login($this->request->post['email'], $this->request->post['password'])) {
+				$this->error['warning'] = $this->language->get('error_login');
+			
+				$this->model_account_customer->addLoginAttempt($this->request->post['email']);
+			} else {
+				$this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
+			}			
 		}
+		
+		return !$this->error;
 	}
 }

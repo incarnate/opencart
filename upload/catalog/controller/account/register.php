@@ -11,7 +11,7 @@ class ControllerAccountRegister extends Controller {
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
-		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment.min.js');
+		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/moment.js');
 		$this->document->addScript('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js');
 		$this->document->addStyle('catalog/view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css');
 
@@ -19,7 +19,10 @@ class ControllerAccountRegister extends Controller {
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
 			$this->model_account_customer->addCustomer($this->request->post);
-
+			
+			// Clear any previous login attempts for unregistered accounts.
+			$this->model_account_customer->deleteLoginAttempts($this->request->post['email']);
+			
 			$this->customer->login($this->request->post['email'], $this->request->post['password']);
 
 			unset($this->session->data['guest']);
@@ -40,21 +43,18 @@ class ControllerAccountRegister extends Controller {
 		$data['breadcrumbs'] = array();
 
 		$data['breadcrumbs'][] = array(
-			'text'      => $this->language->get('text_home'),
-			'href'      => $this->url->link('common/home'),
-			'separator' => false
+			'text' => $this->language->get('text_home'),
+			'href' => $this->url->link('common/home')
 		);
 
 		$data['breadcrumbs'][] = array(
-			'text'      => $this->language->get('text_account'),
-			'href'      => $this->url->link('account/account', '', 'SSL'),
-			'separator' => $this->language->get('text_separator')
+			'text' => $this->language->get('text_account'),
+			'href' => $this->url->link('account/account', '', 'SSL')
 		);
 
 		$data['breadcrumbs'][] = array(
-			'text'      => $this->language->get('text_register'),
-			'href'      => $this->url->link('account/register', '', 'SSL'),
-			'separator' => $this->language->get('text_separator')
+			'text' => $this->language->get('text_register'),
+			'href' => $this->url->link('account/register', '', 'SSL')
 		);
 
 		$data['heading_title'] = $this->language->get('heading_title');
@@ -68,6 +68,7 @@ class ControllerAccountRegister extends Controller {
 		$data['text_no'] = $this->language->get('text_no');
 		$data['text_select'] = $this->language->get('text_select');
 		$data['text_none'] = $this->language->get('text_none');
+		$data['text_loading'] = $this->language->get('text_loading');
 
 		$data['entry_customer_group'] = $this->language->get('entry_customer_group');
 		$data['entry_firstname'] = $this->language->get('entry_firstname');
@@ -117,12 +118,6 @@ class ControllerAccountRegister extends Controller {
 			$data['error_telephone'] = $this->error['telephone'];
 		} else {
 			$data['error_telephone'] = '';
-		}
-
-		if (isset($this->error['fax'])) {
-			$data['error_fax'] = $this->error['fax'];
-		} else {
-			$data['error_fax'] = '';
 		}
 
 		if (isset($this->error['address_1'])) {
@@ -283,7 +278,19 @@ class ControllerAccountRegister extends Controller {
 		$data['custom_fields'] = $this->model_account_custom_field->getCustomFields();
 
 		if (isset($this->request->post['custom_field'])) {
-			$data['register_custom_field'] = $this->request->post['custom_field']['account'] + $this->request->post['custom_field']['address'];
+			if (isset($this->request->post['custom_field']['account'])) {
+				$account_custom_field = $this->request->post['custom_field']['account'];
+			} else {
+				$account_custom_field = array();
+			}
+			
+			if (isset($this->request->post['custom_field']['address'])) {
+				$address_custom_field = $this->request->post['custom_field']['address'];
+			} else {
+				$address_custom_field = array();
+			}			
+			
+			$data['register_custom_field'] = $account_custom_field + $address_custom_field;
 		} else {
 			$data['register_custom_field'] = array();
 		}
@@ -349,7 +356,7 @@ class ControllerAccountRegister extends Controller {
 			$this->error['lastname'] = $this->language->get('error_lastname');
 		}
 
-		if ((utf8_strlen($this->request->post['email']) > 96) || !preg_match('/^[^\@]+@.*\.[a-z]{2,6}$/i', $this->request->post['email'])) {
+		if ((utf8_strlen($this->request->post['email']) > 96) || !preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $this->request->post['email'])) {
 			$this->error['email'] = $this->language->get('error_email');
 		}
 
@@ -357,12 +364,8 @@ class ControllerAccountRegister extends Controller {
 			$this->error['warning'] = $this->language->get('error_exists');
 		}
 
-		if (!is_numeric($this->request->post['telephone']) || (utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32)) {
+		if ((utf8_strlen($this->request->post['telephone']) < 3) || (utf8_strlen($this->request->post['telephone']) > 32)) {
 			$this->error['telephone'] = $this->language->get('error_telephone');
-		}
-
-		if (!is_numeric($this->request->post['fax']) && !empty($this->request->post['fax'])) {
-			$this->error['fax'] = $this->language->get('error_fax');
 		}
 
 		if ((utf8_strlen(trim($this->request->post['address_1'])) < 3) || (utf8_strlen(trim($this->request->post['address_1'])) > 128)) {
@@ -399,7 +402,7 @@ class ControllerAccountRegister extends Controller {
 		// Custom field validation
 		$this->load->model('account/custom_field');
 
-		$custom_fields = $this->model_account_custom_field->getCustomFields(array('filter_customer_group_id' => $customer_group_id));
+		$custom_fields = $this->model_account_custom_field->getCustomFields($customer_group_id);
 
 		foreach ($custom_fields as $custom_field) {
 			if ($custom_field['required'] && empty($this->request->post['custom_field'][$custom_field['location']][$custom_field['custom_field_id']])) {
@@ -429,7 +432,7 @@ class ControllerAccountRegister extends Controller {
 		return !$this->error;
 	}
 
-	public function custom_field() {
+	public function customfield() {
 		$json = array();
 
 		$this->load->model('account/custom_field');
@@ -441,7 +444,7 @@ class ControllerAccountRegister extends Controller {
 			$customer_group_id = $this->config->get('config_customer_group_id');
 		}
 
-		$custom_fields = $this->model_account_custom_field->getCustomFields(array('filter_customer_group_id' => $customer_group_id));
+		$custom_fields = $this->model_account_custom_field->getCustomFields($customer_group_id);
 
 		foreach ($custom_fields as $custom_field) {
 			$json[] = array(

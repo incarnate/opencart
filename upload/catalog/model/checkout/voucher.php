@@ -1,11 +1,15 @@
 <?php
 class ModelCheckoutVoucher extends Model {
 	public function addVoucher($order_id, $data) {
-      	$this->db->query("INSERT INTO " . DB_PREFIX . "voucher SET order_id = '" . (int)$order_id . "', code = '" . $this->db->escape($data['code']) . "', from_name = '" . $this->db->escape($data['from_name']) . "', from_email = '" . $this->db->escape($data['from_email']) . "', to_name = '" . $this->db->escape($data['to_name']) . "', to_email = '" . $this->db->escape($data['to_email']) . "', voucher_theme_id = '" . (int)$data['voucher_theme_id'] . "', message = '" . $this->db->escape($data['message']) . "', amount = '" . (float)$data['amount'] . "', status = '1', date_added = NOW()");
+		$this->db->query("INSERT INTO " . DB_PREFIX . "voucher SET order_id = '" . (int)$order_id . "', code = '" . $this->db->escape($data['code']) . "', from_name = '" . $this->db->escape($data['from_name']) . "', from_email = '" . $this->db->escape($data['from_email']) . "', to_name = '" . $this->db->escape($data['to_name']) . "', to_email = '" . $this->db->escape($data['to_email']) . "', voucher_theme_id = '" . (int)$data['voucher_theme_id'] . "', message = '" . $this->db->escape($data['message']) . "', amount = '" . (float)$data['amount'] . "', status = '1', date_added = NOW()");
 
 		return $this->db->getLastId();
 	}
-
+	
+	public function disableVoucher($order_id) {
+		$this->db->query("UPDATE " . DB_PREFIX . "voucher SET status = '0' WHERE order_id = '" . (int)$order_id . "'");
+	}
+	
 	public function getVoucher($code) {
 		$status = true;
 
@@ -13,7 +17,13 @@ class ModelCheckoutVoucher extends Model {
 
 		if ($voucher_query->num_rows) {
 			if ($voucher_query->row['order_id']) {
-				$order_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order` WHERE order_id = '" . (int)$voucher_query->row['order_id'] . "' AND order_status_id = '" . (int)$this->config->get('config_complete_status_id') . "'");
+				$implode = array();
+	
+				foreach ($this->config->get('config_complete_status') as $order_status_id) {
+					$implode[] = "'" . (int)$order_status_id . "'";
+				}
+				
+				$order_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order` WHERE order_id = '" . (int)$voucher_query->row['order_id'] . "' AND order_status_id IN(" . implode(",", $implode) . ")");
 
 				if (!$order_query->num_rows) {
 					$status = false;
@@ -69,7 +79,7 @@ class ModelCheckoutVoucher extends Model {
 			$this->load->model('localisation/language');
 
 			$language = new Language($order_info['language_directory']);
-			$language->load($order_info['language_filename']);
+			$language->load('default');
 			$language->load('mail/voucher');
 
 			$voucher_query = $this->db->query("SELECT *, vtd.name AS theme FROM `" . DB_PREFIX . "voucher` v LEFT JOIN " . DB_PREFIX . "voucher_theme vt ON (v.voucher_theme_id = vt.voucher_theme_id) LEFT JOIN " . DB_PREFIX . "voucher_theme_description vtd ON (vt.voucher_theme_id = vtd.voucher_theme_id) AND vtd.language_id = '" . (int)$order_info['language_id'] . "' WHERE v.order_id = '" . (int)$order_id . "'");

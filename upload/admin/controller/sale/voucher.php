@@ -12,7 +12,7 @@ class ControllerSaleVoucher extends Controller {
 		$this->getList();
 	}
 
-	public function insert() {
+	public function add() {
 		$this->load->language('sale/voucher');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -44,7 +44,7 @@ class ControllerSaleVoucher extends Controller {
 		$this->getForm();
 	}
 
-	public function update() {
+	public function edit() {
 		$this->load->language('sale/voucher');
 
 		$this->document->setTitle($this->language->get('heading_title'));
@@ -155,7 +155,7 @@ class ControllerSaleVoucher extends Controller {
 			'href' => $this->url->link('sale/voucher', 'token=' . $this->session->data['token'] . $url, 'SSL')
 		);
 
-		$data['insert'] = $this->url->link('sale/voucher/insert', 'token=' . $this->session->data['token'] . $url, 'SSL');
+		$data['add'] = $this->url->link('sale/voucher/add', 'token=' . $this->session->data['token'] . $url, 'SSL');
 		$data['delete'] = $this->url->link('sale/voucher/delete', 'token=' . $this->session->data['token'] . $url, 'SSL');
 
 		$data['vouchers'] = array();
@@ -181,12 +181,13 @@ class ControllerSaleVoucher extends Controller {
 				'amount'     => $this->currency->format($result['amount'], $this->config->get('config_currency')),
 				'status'     => ($result['status'] ? $this->language->get('text_enabled') : $this->language->get('text_disabled')),
 				'date_added' => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
-				'edit'       => $this->url->link('sale/voucher/update', 'token=' . $this->session->data['token'] . '&voucher_id=' . $result['voucher_id'] . $url, 'SSL')
+				'edit'       => $this->url->link('sale/voucher/edit', 'token=' . $this->session->data['token'] . '&voucher_id=' . $result['voucher_id'] . $url, 'SSL')
 			);
 		}
 
 		$data['heading_title'] = $this->language->get('heading_title');
-
+		
+		$data['text_list'] = $this->language->get('text_list');
 		$data['text_no_results'] = $this->language->get('text_no_results');
 		$data['text_confirm'] = $this->language->get('text_confirm');
 
@@ -199,7 +200,7 @@ class ControllerSaleVoucher extends Controller {
 		$data['column_date_added'] = $this->language->get('column_date_added');
 		$data['column_action'] = $this->language->get('column_action');
 
-		$data['button_insert'] = $this->language->get('button_insert');
+		$data['button_add'] = $this->language->get('button_add');
 		$data['button_edit'] = $this->language->get('button_edit');
 		$data['button_delete'] = $this->language->get('button_delete');
 		$data['button_send'] = $this->language->get('button_send');
@@ -270,7 +271,7 @@ class ControllerSaleVoucher extends Controller {
 		$data['order'] = $order;
 
 		$data['header'] = $this->load->controller('common/header');
-		$data['menu'] = $this->load->controller('common/menu');
+		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('sale/voucher_list.tpl', $data));
@@ -278,7 +279,8 @@ class ControllerSaleVoucher extends Controller {
 
 	protected function getForm() {
 		$data['heading_title'] = $this->language->get('heading_title');
-
+		
+		$data['text_form'] = !isset($this->request->get['voucher_id']) ? $this->language->get('text_add') : $this->language->get('text_edit');
 		$data['text_enabled'] = $this->language->get('text_enabled');
 		$data['text_disabled'] = $this->language->get('text_disabled');
 
@@ -376,9 +378,9 @@ class ControllerSaleVoucher extends Controller {
 		);
 
 		if (!isset($this->request->get['voucher_id'])) {
-			$data['action'] = $this->url->link('sale/voucher/insert', 'token=' . $this->session->data['token'] . $url, 'SSL');
+			$data['action'] = $this->url->link('sale/voucher/add', 'token=' . $this->session->data['token'] . $url, 'SSL');
 		} else {
-			$data['action'] = $this->url->link('sale/voucher/update', 'token=' . $this->session->data['token'] . '&voucher_id=' . $this->request->get['voucher_id'] . $url, 'SSL');
+			$data['action'] = $this->url->link('sale/voucher/edit', 'token=' . $this->session->data['token'] . '&voucher_id=' . $this->request->get['voucher_id'] . $url, 'SSL');
 		}
 
 		$data['cancel'] = $this->url->link('sale/voucher', 'token=' . $this->session->data['token'] . $url, 'SSL');
@@ -462,11 +464,11 @@ class ControllerSaleVoucher extends Controller {
 		} elseif (!empty($voucher_info)) {
 			$data['status'] = $voucher_info['status'];
 		} else {
-			$data['status'] = 1;
+			$data['status'] = true;
 		}
 
 		$data['header'] = $this->load->controller('common/header');
-		$data['menu'] = $this->load->controller('common/menu');
+		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('sale/voucher_form.tpl', $data));
@@ -495,7 +497,7 @@ class ControllerSaleVoucher extends Controller {
 			$this->error['to_name'] = $this->language->get('error_to_name');
 		}
 
-		if ((utf8_strlen($this->request->post['to_email']) > 96) || !preg_match('/^[^\@]+@.*\.[a-z]{2,6}$/i', $this->request->post['to_email'])) {
+		if ((utf8_strlen($this->request->post['to_email']) > 96) || !preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $this->request->post['to_email'])) {
 			$this->error['to_email'] = $this->language->get('error_email');
 		}
 
@@ -503,7 +505,7 @@ class ControllerSaleVoucher extends Controller {
 			$this->error['from_name'] = $this->language->get('error_from_name');
 		}
 
-		if ((utf8_strlen($this->request->post['from_email']) > 96) || !preg_match('/^[^\@]+@.*\.[a-z]{2,6}$/i', $this->request->post['from_email'])) {
+		if ((utf8_strlen($this->request->post['from_email']) > 96) || !preg_match('/^[^\@]+@.*.[a-z]{2,15}$/i', $this->request->post['from_email'])) {
 			$this->error['from_email'] = $this->language->get('error_email');
 		}
 

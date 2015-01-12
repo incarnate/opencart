@@ -9,12 +9,12 @@
   <thead>
     <tr>
       <td class="text-left"><?php echo $column_product; ?></td>
-        <td class="text-left"><?php echo $column_model; ?></td>
-        <td class="text-left"><?php echo $column_amazon_order_item_code; ?></td>
-        <td class="text-right"><?php echo $column_quantity; ?></td>
-        <td class="text-right"><?php echo $column_price; ?></td>
-        <td class="text-right"><?php echo $column_total; ?></td>
-	</tr>
+      <td class="text-left"><?php echo $column_model; ?></td>
+      <td class="text-left"><?php echo $column_amazon_order_item_code; ?></td>
+      <td class="text-right"><?php echo $column_quantity; ?></td>
+      <td class="text-right"><?php echo $column_price; ?></td>
+      <td class="text-right"><?php echo $column_total; ?></td>
+    </tr>
   </thead>
   <tbody>
     <?php foreach ($products as $product) { ?>
@@ -27,8 +27,7 @@
         <?php } else { ?>
         &nbsp;<small> - <?php echo $option['name']; ?>: <a href="<?php echo $option['href']; ?>"><?php echo $option['value']; ?></a></small>
         <?php } ?>
-        <?php } ?>
-	  </td>
+        <?php } ?></td>
       <td class="text-left"><?php echo $product['model']; ?></td>
       <td class="text-left"><?php echo $product['amazon_order_item_code']; ?></td>
       <td class="text-right"><?php echo $product['quantity']; ?></td>
@@ -41,7 +40,9 @@
 <p><?php echo $help_adjustment; ?></p>
 <p><?php echo $text_download; ?></p>
 <p><?php echo $text_upload_template; ?></p>
-<p><button type="button" id="button-upload" class="btn btn-primary"><i class="fa fa-upload"></i> <?php echo $text_upload; ?></button></p>
+<p>
+  <button type="button" id="button-upload" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><i class="fa fa-upload"></i> <?php echo $text_upload; ?></button>
+</p>
 <table class="table table-bordered">
   <thead>
     <tr>
@@ -57,7 +58,7 @@
       <td class="text-left"><?php echo $report_submission['status'] ?></td>
       <td class="text-left"><?php echo $report_submission['text'] ?></td>
     </tr>
-	<?php } ?>
+    <?php } ?>
   </tbody>
 </table>
 <script type="text/javascript"><!--
@@ -68,37 +69,41 @@ $('#button-upload').on('click', function() {
 
 	$('#form-upload input[name=\'file\']').trigger('click');
 	
-	$('#form-upload input[name=\'file\']').on('change', function() {
-		$.ajax({
-			url: 'index.php?route=payment/amazon_checkout/uploadOrderAdjustment&token=<?php echo $token; ?>',
-			type: 'post',
-			dataType: 'json',
-			data: new FormData($(this).parent()[0]),
-			cache: false,
-			contentType: false,
-			processData: false,	
-
-			beforeSend: function() {
-				$('#button-upload').after('<span style="margin-left: 5px;" class="btn btn-primary loading"><i class="fa fa-cog fa-spin fa-lg"></i></span>');
-				$('#button-upload').attr('disabled', true);
-			},
-
-			success: function(json) {
-				$('#button-upload').attr('disabled', false);
-
-				if (json['success']) {
-					alert(json['success']);
-
-					$.get('index.php?route=payment/amazon_checkout/addSubmission&order_id=<?php echo $order_id ?>&submission_id=' + json['submission_id'] + '&token=<?php echo $token; ?>');
+	timer = setInterval(function() {
+		if ($('#form-upload input[name=\'file\']').val() != '') {
+			clearInterval(timer);
+			
+			$.ajax({
+				url: 'index.php?route=payment/amazon_checkout/uploadOrderAdjustment&token=<?php echo $token; ?>',
+				type: 'post',
+				dataType: 'json',
+				data: new FormData($('#form-upload')[0]),
+				cache: false,
+				contentType: false,
+				processData: false,	
+				beforeSend: function() {
+					$('#button-upload').button('loading');
+				},
+				complete: function() {
+					$('#button-upload').button('reset');
+				},
+				success: function(json) {
+					$('#button-upload').attr('disabled', false);
+	
+					if (json['success']) {
+						alert(json['success']);
+	
+						$.get('index.php?route=payment/amazon_checkout/addSubmission&order_id=<?php echo $order_id ?>&submission_id=' + json['submission_id'] + '&token=<?php echo $token; ?>');
+					}
+	
+					if (json['error']) {
+						alert(json['error']);
+					}
+	
+					$('.loading').remove();	
 				}
-
-				if (json['error']) {
-					alert(json['error']);
-				}
-
-				$('.loading').remove();	
-			}
-		});
-	});
+			});
+		}
+	}, 500);
 });
 //--></script>

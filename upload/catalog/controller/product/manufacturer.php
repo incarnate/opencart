@@ -380,7 +380,7 @@ class ControllerProductManufacturer extends Controller {
 
 			$data['breadcrumbs'][] = array(
 				'text' => $this->language->get('text_error'),
-				'href' => $this->url->link('product/category', $url)
+				'href' => $this->url->link('product/manufacturer/info', $url)
 			);
 
 			$this->document->setTitle($this->language->get('text_error'));
@@ -392,6 +392,8 @@ class ControllerProductManufacturer extends Controller {
 			$data['button_continue'] = $this->language->get('button_continue');
 
 			$data['continue'] = $this->url->link('common/home');
+
+			$this->response->addHeader($this->request->server['SERVER_PROTOCOL'] . ' 404 Not Found');
 
 			$data['header'] = $this->load->controller('common/header');
 			$data['footer'] = $this->load->controller('common/footer');
