@@ -5,10 +5,10 @@ $_['text_title']            = 'Pay with Credit Card (eWAY)';
 $_['text_credit_card']      = 'Credit Card Details';
 $_['text_testing']          = 'This payment gateway is currently being tested. Your credit card will not be charged.<br />If this is a real order, please use an alternate method of payment at this time.';
 
-$_['text_basket']         = 'Basket';
-$_['text_checkout']       = 'Checkout';
-$_['text_success']        = 'Success';
-$_['text_shipping']        = 'Shipping';
+$_['text_basket']           = 'Basket';
+$_['text_checkout']         = 'Checkout';
+$_['text_success']          = 'Success';
+$_['text_shipping']         = 'Shipping';
 
 // Entry
 $_['entry_cc_number']      = 'Card number';
@@ -16,22 +16,22 @@ $_['entry_cc_name']        = 'Cardholder name';
 $_['entry_cc_expire_date'] = 'Card expiry date';
 $_['entry_cc_cvv2']        = 'Card security code (CVV2)';
 
-$_['text_card_accepted'] = 'Accepted cards: ';
-$_['text_card_type_m'] = 'Mastercard';
-$_['text_card_type_v'] = 'Visa (Credit/Debit/Electron/Delta)';
-$_['text_card_type_c'] = 'Diners';
-$_['text_card_type_a'] = 'American Express';
-$_['text_card_type_j'] = 'JCB';
-$_['text_card_type_pp'] = 'Paypal';
-$_['text_card_type_mp'] = 'Masterpass';
-$_['text_card_type_vm'] = 'V.me by Visa';
-$_['text_type_help'] = 'After you click "Confirm Order"  you will be redirected to ';
+$_['text_card_accepted']   = 'Accepted cards: ';
+$_['text_card_type_m']     = 'Mastercard';
+$_['text_card_type_v']     = 'Visa (Credit/Debit/Electron/Delta)';
+$_['text_card_type_c']     = 'Diners';
+$_['text_card_type_a']     = 'American Express';
+$_['text_card_type_j']     = 'JCB';
+$_['text_card_type_pp']    = 'Paypal';
+$_['text_card_type_mp']    = 'Masterpass';
+$_['text_card_type_vm']    = 'Visa Checkout';
+$_['text_type_help']       = 'After you click "Confirm Order"  you will be redirected to ';
 
-$_['text_transaction_failed'] = 'Sorry, your transaction failed: ';
+$_['text_transaction_failed'] = 'Sorry, your payment has been declined.';
 
 // Help
-$_['help_cvv'] = 'For Mastercard or Visa, this is the last three digits in the signature area on the back of your card.';
-$_['help_cvv_amex'] = 'For American Express, it\'s the four digits on the front of the card';
+$_['help_cvv']             = 'For Mastercard or Visa, this is the last three digits in the signature area on the back of your card.';
+$_['help_cvv_amex']        = 'For American Express, it\'s the four digits on the front of the card';
 
 // Validation Error codes
 $_['text_card_message_V6000'] = 'Undefined Validation Error';

@@ -4,7 +4,7 @@ class ModelPaymentEway extends Model {
 		$this->load->language('payment/eway');
 
 		if ($this->config->get('eway_status')) {
-			$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int) $this->config->get('eway_standard_geo_zone_id') . "' AND country_id = '" . (int) $address['country_id'] . "' AND (zone_id = '" . (int) $address['zone_id'] . "' OR zone_id = '0')");
+			$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get('eway_standard_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
 			if (!$this->config->get('eway_standard_geo_zone_id')) {
 				$status = true;
 			} elseif ($query->num_rows) {
@@ -17,6 +17,7 @@ class ModelPaymentEway extends Model {
 		}
 
 		$method_data = array();
+
 		if ($status) {
 			$method_data = array(
 				'code' => 'eway',
@@ -35,13 +36,13 @@ class ModelPaymentEway extends Model {
 		if ($this->config->get('eway_transaction_method') == 'payment') {
 			$cap = ",`capture_status` = '1'";
 		}
-		$this->db->query("INSERT INTO `" . DB_PREFIX . "eway_order` SET `order_id` = '" . (int) $order_data['order_id'] . "', `created` = NOW(), `modified` = NOW(), `debug_data` = '" . $this->db->escape($order_data['debug_data']) . "', `amount` = '" . $this->currency->format($order_data['amount'], $order_data['currency_code'], false, false) . "', `currency_code` = '" . $this->db->escape($order_data['currency_code']) . "', `transaction_id` = '" . $this->db->escape($order_data['transaction_id']) . "'{$cap}");
+		$this->db->query("INSERT INTO `" . DB_PREFIX . "eway_order` SET `order_id` = '" . (int)$order_data['order_id'] . "', `created` = NOW(), `modified` = NOW(), `debug_data` = '" . $this->db->escape($order_data['debug_data']) . "', `amount` = '" . $this->currency->format($order_data['amount'], $order_data['currency_code'], false, false) . "', `currency_code` = '" . $this->db->escape($order_data['currency_code']) . "', `transaction_id` = '" . $this->db->escape($order_data['transaction_id']) . "'{$cap}");
 
 		return $this->db->getLastId();
 	}
 
 	public function addTransaction($eway_order_id, $type, $transactionid, $order_info) {
-		$this->db->query("INSERT INTO `" . DB_PREFIX . "eway_transactions` SET `eway_order_id` = '" . (int) $eway_order_id . "', `created` = NOW(), `transaction_id` = '".$this->db->escape($transactionid)."', `type` = '".$this->db->escape($type)."', `amount` = '" . $this->currency->format($order_info['total'], $order_info['currency_code'], false, false) . "'");
+		$this->db->query("INSERT INTO `" . DB_PREFIX . "eway_transactions` SET `eway_order_id` = '" . (int)$eway_order_id . "', `created` = NOW(), `transaction_id` = '" . $this->db->escape($transactionid) . "', `type` = '" . $this->db->escape($type) . "', `amount` = '" . $this->currency->format($order_info['total'], $order_info['currency_code'], false, false) . "'");
 
 		return $this->db->getLastId();
 	}
@@ -106,11 +107,11 @@ class ModelPaymentEway extends Model {
 		return $response;
 	}
 
-	public function getAccessCodeResult($accessCode) {
+	public function getAccessCodeResult($access_code) {
 		if ($this->config->get('eway_test')) {
-			$url = 'https://api.sandbox.ewaypayments.com/AccessCode/'.$accessCode;
+			$url = 'https://api.sandbox.ewaypayments.com/AccessCode/' . $access_code;
 		} else {
-			$url = 'https://api.ewaypayments.com/AccessCode/'.$accessCode;
+			$url = 'https://api.ewaypayments.com/AccessCode/' . $access_code;
 		}
 
 		$response = $this->sendCurl($url, '', false);
@@ -119,15 +120,15 @@ class ModelPaymentEway extends Model {
 		return $response;
 	}
 
-	public function sendCurl($url, $data, $isPost=true) {
+	public function sendCurl($url, $data, $is_post=true) {
 		$ch = curl_init($url);
-        
-        $eway_username = html_entity_decode($this->config->get('eway_username'), ENT_QUOTES, 'UTF-8');
-        $eway_password = html_entity_decode($this->config->get('eway_password'), ENT_QUOTES, 'UTF-8');
-    
+
+		$eway_username = html_entity_decode($this->config->get('eway_username'), ENT_QUOTES, 'UTF-8');
+		$eway_password = html_entity_decode($this->config->get('eway_password'), ENT_QUOTES, 'UTF-8');
+
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
 		curl_setopt($ch, CURLOPT_USERPWD, $eway_username . ":" . $eway_password);
-		if ($isPost) {
+		if ($is_post) {
 		curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 		} else {
@@ -153,7 +154,7 @@ class ModelPaymentEway extends Model {
 				if ($info['http_code'] == 401 || $info['http_code'] == 404) {
 					$response->Errors = "Please check the API Key and Password";
 				} else {
-					$response->Errors = 'Error connecting to eWAY: '.$info['http_code'];
+					$response->Errors = 'Error connecting to eWAY: ' . $info['http_code'];
 				}
 				$response = json_encode($response);
 			}

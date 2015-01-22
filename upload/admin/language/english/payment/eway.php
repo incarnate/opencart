@@ -1,21 +1,22 @@
 <?php
 // Heading
-$_['heading_title']      = 'eWAY Payment';
+$_['heading_title']     = 'eWAY Payment';
 
 // Text
-$_['text_payment']       = 'Payment';
-$_['text_success']       = 'Success: You have modified your eWAY details!';
-$_['text_eway']   = '<a target="_BLANK" href="http://www.eway.com.au/"><img src="view/image/payment/eway_au.jpg" alt="eWAY" title="eWAY" style="border: 1px solid #EEEEEE;" /></a>';
-$_['text_authorisation']                = 'Authorisation';
-$_['text_sale']                         = 'Sale';
-$_['text_loading']			= 'Loading...';
+$_['text_payment']      = 'Payment';
+$_['text_success']      = 'Success: You have modified your eWAY details!';
+$_['text_edit']             = 'Edit eWAY';
+$_['text_eway']         = '<a target="_BLANK" href="http://www.eway.com.au/"><img src="view/image/payment/eway_au.jpg" alt="eWAY" title="eWAY" style="border: 1px solid #EEEEEE;" /></a>';
+$_['text_authorisation'] = 'Authorisation';
+$_['text_sale']         = 'Sale';
+$_['text_loading']      = 'Loading...';
 
 // Entry
 $_['entry_test']         = 'Test mode';
 $_['entry_order_status'] = 'Order status';
 $_['entry_order_status_refund'] = 'Refunded order status';
 $_['entry_order_status_auth'] = 'Authorised order status';
-$_['entry_order_status_fraud'] = 'Fraud order status';
+$_['entry_order_status_fraud'] = 'Suspected Fraud order status';
 $_['entry_status']       = 'Status';
 $_['entry_username']	 = 'eWAY API Key';
 $_['entry_password']	 = 'eWAY password';
@@ -26,48 +27,44 @@ $_['entry_transaction_method']   = 'Transaction Method';
 
 // Error
 $_['error_permission']   = 'Warning: You do not have permission to modify the eWAY payment module';
-$_['error_username'] = 'eWAY API Key is required!';
-$_['error_password'] = 'eWAY password is required!';
+$_['error_username']     = 'eWAY API Key is required!';
+$_['error_password']     = 'eWAY password is required!';
 $_['error_payment_type'] = 'At least one payment type is required!';
 
 // Help hints
-$_['help_testmode']   = 'Set to Yes to use the eWAY Sandbox.';
-$_['help_username']   = 'Your eWAY API Key from your MYeWAY account.';
-$_['help_password']   = 'Your eWAY API Password from your MYeWAY account.';
-$_['help_payment_type']   = 'The types of payment you accept.';
-$_['help_setorderstatus']   = 'Set the status of orders made with this payment module to this value.';
-$_['help_setorderstatus_refund']   = 'Set the status of orders which are refunded to this value.';
-$_['help_sort_order']   = 'Set the display order in relation to other payment options. The higher the number the lower it is.';
-$_['help_transaction_method']   = 'Authorisation is only available for Australian banks';
+$_['help_testmode']      = 'Set to Yes to use the eWAY Sandbox.';
+$_['help_username']      = 'Your eWAY API Key from your MYeWAY account.';
+$_['help_password']      = 'Your eWAY API Password from your MYeWAY account.';
+$_['help_transaction_method'] = 'Authorisation is only available for Australian banks';
 
 // Order page - payment tab
-$_['text_payment_info'] = 'Payment information';
-$_['text_order_total'] = 'Total authorised';
-$_['text_transactions'] = 'Transactions';
+$_['text_payment_info']   = 'Payment information';
+$_['text_order_total']    = 'Total authorised';
+$_['text_transactions']   = 'Transactions';
 $_['text_column_transactionid'] = 'eWAY Transaction ID';
-$_['text_column_amount'] = 'Amount';
-$_['text_column_type'] = 'Type';
+$_['text_column_amount']  = 'Amount';
+$_['text_column_type']    = 'Type';
 $_['text_column_created'] = 'Created';
 $_['text_total_captured'] = 'Total captured';
 $_['text_capture_status'] = 'Payment captured';
-$_['text_void_status'] = 'Payment voided';
-$_['text_refund_status'] = 'Payment refunded';
+$_['text_void_status']    = 'Payment voided';
+$_['text_refund_status']  = 'Payment refunded';
 $_['text_total_refunded'] = 'Total refunded';
 $_['text_refund_success'] = 'Refund succeeded!';
 $_['text_capture_success'] = 'Capture succeeded!';
-$_['text_refund_failed'] = 'Refund failed: ';
+$_['text_refund_failed']  = 'Refund failed: ';
 $_['text_capture_failed'] = 'Capture failed: ';
 $_['text_unknown_failure'] = 'Invalid order or amount';
 
 $_['text_confirm_capture'] = 'Are you sure you want to capture the payment?';
 $_['text_confirm_release'] = 'Are you sure you want to release the payment?';
-$_['text_confirm_refund'] = 'Are you sure you want to refund the payment?';
+$_['text_confirm_refund']  = 'Are you sure you want to refund the payment?';
 
-$_['text_empty_refund'] = 'Please enter an amount to refund';
+$_['text_empty_refund']  = 'Please enter an amount to refund';
 $_['text_empty_capture'] = 'Please enter an amount to capture';
 
-$_['btn_refund'] = 'Refund';
-$_['btn_capture'] = 'Capture';
+$_['btn_refund']         = 'Refund';
+$_['btn_capture']        = 'Capture';
 
 // Validation Error codes
 $_['text_card_message_V6000'] = 'Undefined Validation Error';

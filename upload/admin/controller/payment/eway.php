@@ -19,6 +19,7 @@ class ControllerPaymentEway extends Controller {
 
 		$data['heading_title'] = $this->language->get('heading_title');
 
+		$data['text_edit'] = $this->language->get('text_edit');
 		$data['text_enabled'] = $this->language->get('text_enabled');
 		$data['text_disabled'] = $this->language->get('text_disabled');
 		$data['text_yes'] = $this->language->get('text_yes');
@@ -47,10 +48,6 @@ class ControllerPaymentEway extends Controller {
 		$data['help_testmode'] = $this->language->get('help_testmode');
 		$data['help_username'] = $this->language->get('help_username');
 		$data['help_password'] = $this->language->get('help_password');
-		$data['help_setorderstatus'] = $this->language->get('help_setorderstatus');
-		$data['help_setorderstatus_refund'] = $this->language->get('help_setorderstatus_refund');
-		$data['help_sort_order'] = $this->language->get('help_sort_order');
-		$data['help_payment_type'] = $this->language->get('help_payment_type');
 		$data['help_transaction_method'] = $this->language->get('help_transaction_method');
 
 		$data['button_save'] = $this->language->get('button_save');
@@ -195,7 +192,7 @@ class ControllerPaymentEway extends Controller {
 		}
 
 		$data['header'] = $this->load->controller('common/header');
-		$data['menu'] = $this->load->controller('common/menu');
+		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer'] = $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('payment/eway.tpl', $data));
@@ -267,7 +264,7 @@ class ControllerPaymentEway extends Controller {
 		$this->load->language('payment/eway');
 
 		$order_id = $this->request->post['order_id'];
-		$refund_amount = (double) $this->request->post['refund_amount'];
+		$refund_amount = (double)$this->request->post['refund_amount'];
 
 		if ($order_id && $refund_amount > 0) {
 			$this->load->model('payment/eway');
@@ -282,10 +279,10 @@ class ControllerPaymentEway extends Controller {
 				} else {
 					$errors = explode(',', $result->Errors);
 					foreach ($errors as $error) {
-						$reason .= $this->language->get('text_card_message_'.$result->Errors);
+						$reason .= $this->language->get('text_card_message_' . $result->Errors);
 					}
 				}
-				$json['message'] = $this->config->get('text_refund_failed').$reason;
+				$json['message'] = $this->config->get('text_refund_failed') . $reason;
 			} else {
 				$eway_order = $this->model_payment_eway->getOrder($order_id);
 				$this->model_payment_eway->addTransaction($eway_order['eway_order_id'], $result->Refund->TransactionID, 'refund', $result->Refund->TotalAmount/100, $eway_order['currency_code']);
@@ -297,15 +294,6 @@ class ControllerPaymentEway extends Controller {
 				if ($total_captured == $total_refunded) {
 					$refund_status = 1;
 					$this->model_payment_eway->updateRefundStatus($eway_order['eway_order_id'], $refund_status);
-
-					$this->load->model('sale/order');
-
-					$history = array();
-					$history['order_status_id'] = $this->config->get('eway_order_status_refunded_id');
-					$history['comment'] = '';
-					$history['notify'] = '';
-
-					$this->model_sale_order->addOrderHistory($eway_order['order_id'], $history);
 				}
 
 				$json['data'] = array();
@@ -331,7 +319,7 @@ class ControllerPaymentEway extends Controller {
 		$this->load->language('payment/eway');
 
 		$order_id = $this->request->post['order_id'];
-		$capture_amount = (double) $this->request->post['capture_amount'];
+		$capture_amount = (double)$this->request->post['capture_amount'];
 
 		if ($order_id && $capture_amount > 0) {
 			$this->load->model('payment/eway');
@@ -347,10 +335,10 @@ class ControllerPaymentEway extends Controller {
 				} else {
 					$errors = explode(',', $result->Errors);
 					foreach ($errors as $error) {
-						$reason .= $this->language->get('text_card_message_'.$result->Errors);
+						$reason .= $this->language->get('text_card_message_' . $result->Errors);
 					}
 				}
-				$json['message'] = $this->config->get('text_capture_failed').$reason;
+				$json['message'] = $this->config->get('text_capture_failed') . $reason;
 			} else {
 				$this->model_payment_eway->addTransaction($eway_order['eway_order_id'], $result->TransactionID, 'payment', $capture_amount, $eway_order['currency_code']);
 
@@ -364,15 +352,6 @@ class ControllerPaymentEway extends Controller {
 
 				$this->model_payment_eway->updateCaptureStatus($eway_order['eway_order_id'], 1);
 				$this->model_payment_eway->updateTransactionId($eway_order['eway_order_id'], $result->TransactionID);
-
-				$this->load->model('sale/order');
-
-				$history = array();
-				$history['order_status_id'] = $this->config->get('eway_order_status_id');
-				$history['comment'] = '';
-				$history['notify'] = '';
-
-				$this->model_sale_order->addOrderHistory($eway_order['order_id'], $history);
 
 				$json['data'] = array();
 				$json['data']['transactionid'] = $result->TransactionID;
@@ -407,10 +386,6 @@ class ControllerPaymentEway extends Controller {
 			$this->error['payment_type'] = $this->language->get('error_payment_type');
 		}
 
-		if (!$this->error) {
-			return true;
-		} else {
-			return false;
-		}
+		return !$this->error;
 	}
 }
