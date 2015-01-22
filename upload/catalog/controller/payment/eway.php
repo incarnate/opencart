@@ -6,6 +6,7 @@ class ControllerPaymentEway extends Controller {
 
 		$data['button_confirm'] = $this->language->get('button_confirm');
 		$data['text_credit_card'] = $this->language->get('text_credit_card');
+		$data['text_loading'] = $this->language->get('text_loading');
 		$data['entry_cc_name'] = $this->language->get('entry_cc_name');
 		$data['entry_cc_number'] = $this->language->get('entry_cc_number');
 		$data['entry_cc_expire_date'] = $this->language->get('entry_cc_expire_date');
@@ -31,6 +32,7 @@ class ControllerPaymentEway extends Controller {
 		}
 
 		$today = getdate();
+
 		$data['year_expire'] = array();
 
 		for ($i = $today['year']; $i < $today['year'] + 11; $i++) {
@@ -92,8 +94,9 @@ class ControllerPaymentEway extends Controller {
 			$invoice_desc .= $product['name'] . ', ';
 		}
 		$invoice_desc = substr($invoice_desc, 0, -2);
-		if (strlen($invoice_desc) > 64)
+		if (strlen($invoice_desc) > 64) {
 			$invoice_desc = substr($invoice_desc, 0, 61) . '...';
+		}
 
 		$shipping = $this->currency->format($order_info['total'] - $this->cart->getSubTotal(), $order_info['currency_code'], false, false);
 
@@ -125,7 +128,7 @@ class ControllerPaymentEway extends Controller {
 			$request->Method = 'ProcessPayment';
 		}
 		$request->TransactionType = 'Purchase';
-		$request->DeviceID = 'opencart-'.VERSION.' eway-trans-2.0';
+		$request->DeviceID = 'opencart-' . VERSION . ' eway-trans-2.0';
 		$request->CustomerIP = $this->request->server['REMOTE_ADDR'];
 
 		$this->load->model('payment/eway');
@@ -179,7 +182,7 @@ class ControllerPaymentEway extends Controller {
 				$is_error = true;
 				$lbl_error = '';
 				foreach ($error_array as $error) {
-					$error = $this->language->get('text_card_message_'.$error);
+					$error = $this->language->get('text_card_message_' . $error);
 					$lbl_error .= $error . ", ";
 				}
 				$this->log->write('eWAY error: ' . $lbl_error);
@@ -194,11 +197,11 @@ class ControllerPaymentEway extends Controller {
 					foreach ($error_array as $error) {
 						// Don't show fraud issues to customers
 						if (stripos($error, 'F') === false) {
-							$lbl_error .= $this->language->get('text_card_message_'.$error);
+							$lbl_error .= $this->language->get('text_card_message_' . $error);
 						} else {
 							$fraud = true;
 						}
-						$log_error .= $this->language->get('text_card_message_'.$error) . ", ";
+						$log_error .= $this->language->get('text_card_message_' . $error) . ", ";
 					}
 					$log_error = substr($log_error, 0, -2);
 					$this->log->write('eWAY payment failed: ' . $log_error);
@@ -209,14 +212,9 @@ class ControllerPaymentEway extends Controller {
 
 			if ($is_error) {
 				if ($fraud) {
-					$message = "Possible Fraud\n";
-					$message .= 'Transaction ID: '.$result->TransactionID."\n";
-					$message .= 'Fraud reason: '.$log_error."\n";
-					$message .= 'Beagle Score: '.$result->BeagleScore."\n";
-					$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('eway_order_status_fraud_id'), $message);
 					$this->response->redirect($this->url->link('checkout/failure', '', 'SSL'));
 				} else {
-					$this->session->data['error'] = $this->language->get('text_transaction_failed').$lbl_error;
+					$this->session->data['error'] = $this->language->get('text_transaction_failed');
 					$this->response->redirect($this->url->link('checkout/checkout', '', 'SSL'));
 				}
 			} else {
@@ -233,14 +231,31 @@ class ControllerPaymentEway extends Controller {
 					'debug_data' => json_encode($result)
 				);
 
+				$error_array = explode(", ", $result->ResponseMessage);
+				$log_error = '';
+				foreach ($error_array as $error) {
+					if (stripos($error, 'F') !== false) {
+						$fraud = true;
+						$log_error .= $this->language->get('text_card_message_' . $error) . ", ";
+					}
+				}
+				$log_error = substr($log_error, 0, -2);
+
 				$eway_order_id = $this->model_payment_eway->addOrder($eway_order_data);
 				$this->model_payment_eway->addTransaction($eway_order_id, $this->config->get('eway_transaction_method'), $result->TransactionID, $order_info);
 
-				$message = 'Transaction ID: '.$result->TransactionID."\n";
-				$message .= 'Authorisation Code: '.$result->AuthorisationCode."\n";
-				$message .= 'Card Response Code: '.$result->ResponseCode."\n";
+				if ($fraud) {
+					$message = 'Suspected fraud order: ' . $log_error . "\n";
+				} else {
+					$message = "eWAY Payment accepted\n";
+				}
+				$message .= 'Transaction ID: ' . $result->TransactionID . "\n";
+				$message .= 'Authorisation Code: ' . $result->AuthorisationCode . "\n";
+				$message .= 'Card Response Code: ' . $result->ResponseCode . "\n";
 
-				if ($this->config->get('eway_transaction_method') == 'payment') {
+				if ($fraud) {
+					$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('eway_order_status_fraud_id'), $message);
+				} elseif ($this->config->get('eway_transaction_method') == 'payment') {
 					$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('eway_order_status_id'), $message);
 				} else {
 					$this->model_checkout_order->addOrderHistory($order_id, $this->config->get('eway_order_status_auth_id'), $message);

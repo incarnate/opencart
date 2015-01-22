@@ -7,30 +7,30 @@
   </tr>
   <tr>
     <td><?php echo $text_total_captured; ?></td>
-    <td id="eway_total_captured"><?php echo $eway_order['total_captured_formatted']; ?></td>
+    <td id="eway-total-captured"><?php echo $eway_order['total_captured_formatted']; ?></td>
   <td>
       <?php if (($eway_order['void_status'] == 0) && ($eway_order['capture_status'] == 0) ) { ?>
-      <input type="text" name="eway_capture_amount" placeholder="<?php echo $eway_order['uncaptured']; ?>" id="eway_capture_amount" class="" />
-        <a class="button btn btn-primary" id="btn_capture"><?php echo $btn_capture; ?></a>
-        <span class="btn btn-primary" id="img_loading_capture" style="display:none;"><i class="fa fa-cog fa-spin fa-lg"></i></span>
+      <input type="text" name="eway_capture_amount" placeholder="<?php echo $eway_order['uncaptured']; ?>" id="eway-capture-amount" class="" />
+        <a class="button btn btn-primary" id="btn-capture"><?php echo $btn_capture; ?></a>
+        <span class="btn btn-primary" id="img-loading-capture" style="display:none;"><i class="fa fa-cog fa-spin fa-lg"></i></span>
         <?php } ?>
   </td>
   </tr>
   <tr>
     <td><?php echo $text_total_refunded; ?></td>
-    <td id="eway_total_refunded"><?php echo $eway_order['total_refunded_formatted']; ?></td>
+    <td id="eway-total-refunded"><?php echo $eway_order['total_refunded_formatted']; ?></td>
     <td>
       <?php if ($eway_order['refund_status'] == 0 && $eway_order['capture_status'] == 1) { ?>
-        <input type="text" name="eway_refund_amount" placeholder="<?php echo $eway_order['unrefunded']; ?>" id="eway_refund_amount" class="" />
-        <a class="button btn btn-primary" id="btn_refund"><?php echo $btn_refund; ?></a>
-        <span class="btn btn-primary" id="img_loading_refund" style="display:none;"><i class="fa fa-cog fa-spin fa-lg"></i></span>
+        <input type="text" name="eway_refund_amount" placeholder="<?php echo $eway_order['unrefunded']; ?>" id="eway-refund-amount" class="" />
+        <a class="button btn btn-primary" id="btn-refund"><?php echo $btn_refund; ?></a>
+        <span class="btn btn-primary" id="img-loading-refund" style="display:none;"><i class="fa fa-cog fa-spin fa-lg"></i></span>
       <?php } ?>
     </td>
   </tr>
   <tr>
     <td><?php echo $text_transactions; ?>:</td>
     <td colspan="2">
-      <table class="table table-striped table-bordered" id="eway_transactions">
+      <table class="table table-striped table-bordered" id="eway-transactions">
         <thead>
           <tr>
             <td class="text-left"><strong><?php echo $text_column_transactionid; ?></strong></td>
@@ -55,21 +55,21 @@
 </table>
 
 <script type="text/javascript"><!--
-	$("#btn_refund").bind('click', function () {
-		if ($('#eway_refund_amount').val() != '' && confirm('<?php echo $text_confirm_refund; ?>')) {
+	$("#btn-refund").bind('click', function () {
+		if ($('#eway-refund-amount').val() != '' && confirm('<?php echo $text_confirm_refund; ?>')) {
 			$.ajax({
 				type:'POST',
 				dataType: 'json',
 				data: {
 					'order_id': <?php echo $order_id; ?>,
-					'refund_amount': $("#eway_refund_amount").val()
+					'refund_amount': $("#eway-refund-amount").val()
 				},
 				url: 'index.php?route=payment/eway/refund&token=<?php echo $token; ?>',
 				beforeSend: function(xhr, opts) {
-					$('#btn_refund').hide();
-					$('#img_loading_refund').show();
+					$('#btn-refund').hide();
+					$('#img-loading-refund').show();
 					$('#eway-transaction-msg').hide();
-					$('#eway_refund_amount').hide();
+					$('#eway-refund-amount').hide();
 				},
 				success: function(data) {
 					if (data.error == false) {
@@ -80,15 +80,15 @@
 						html += '<td class="text-left">refund</td>';
 						html += '<td class="text-left">'+data.data.amount+'</td>';
 						html += '</tr>';
-						$('#eway_transactions tr:last').after(html);
+						$('#eway-transactions tr:last').after(html);
 
-						$('#eway_total_refunded').text(data.data.total_refunded_formatted);
+						$('#eway-total-refunded').text(data.data.total_refunded_formatted);
 
 						if (data.data.refund_status != 1) {
-							$('#btn_refund').show();
-							$('#eway_refund_amount').show();
-							$("#eway_refund_amount").val('');
-							$("#eway_refund_amount").attr('placeholder',data.data.remaining);
+							$('#btn-refund').show();
+							$('#eway-refund-amount').show();
+							$('#eway-refund-amount').val('');
+							$('#eway-refund-amount').attr('placeholder',data.data.remaining);
 						}
 
 						if (data.message != '') {
@@ -97,11 +97,11 @@
 					}
 					if (data.error == true) {
 						alert(data.message);
-						$('#btn_refund').show();
-						$('#eway_refund_amount').show();
+						$('#btn-refund').show();
+						$('#eway-refund-amount').show();
 					}
 
-					$('#img_loading_refund').hide();
+					$('#img-loading-refund').hide();
 				}
 			});
 		}
@@ -109,21 +109,21 @@
 //-->
 </script>
 <script type="text/javascript"><!--
-	$("#btn_capture").bind('click', function () {
-		if ($('#eway_capture_amount').val() != '' && confirm('<?php echo $text_confirm_capture; ?>')) {
+	$("#btn-capture").bind('click', function () {
+		if ($('#eway-capture-amount').val() != '' && confirm('<?php echo $text_confirm_capture; ?>')) {
 			$.ajax({
 				type:'POST',
 				dataType: 'json',
 				data: {
 					'order_id': <?php echo $order_id; ?>,
-					'capture_amount': $("#eway_capture_amount").val()
+					'capture_amount': $("#eway-capture-amount").val()
 				},
 				url: 'index.php?route=payment/eway/capture&token=<?php echo $token; ?>',
 				beforeSend: function(xhr, opts) {
-					$('#btn_capture').hide();
-					$('#img_loading_capture').show();
+					$('#btn-capture').hide();
+					$('#img-loading-capture').show();
 					$('#eway-transaction-msg').hide();
-					$('#eway_capture_amount').hide();
+					$('#eway-capture-amount').hide();
 				},
 				success: function(data) {
 					if (data.error == false) {
@@ -134,15 +134,15 @@
 						html += '<td class="text-left">payment</td>';
 						html += '<td class="text-left">'+data.data.amount+'</td>';
 						html += '</tr>';
-						$('#eway_transactions tr:last').after(html);
+						$('#eway-transactions tr:last').after(html);
 
-						$('#eway_total_captured').text(data.data.total_captured_formatted);
+						$('#eway-total-captured').text(data.data.total_captured_formatted);
 
 						if (data.data.capture_status != 1) {
-							$('#btn_capture').show();
-							$('#eway_capture_amount').show();
-							$("#eway_capture_amount").val('');
-							$("#eway_capture_amount").attr('placeholder',data.data.remaining);
+							$('#btn-capture').show();
+							$('#eway-capture-amount').show();
+							$("#eway-capture-amount").val('');
+							$("#eway-capture-amount").attr('placeholder',data.data.remaining);
 						}
 
 						if (data.message != '') {
@@ -151,11 +151,11 @@
 					}
 					if (data.error == true) {
 						alert(data.message);
-						$('#btn_capture').show();
-						$('#eway_capture_amount').show();
+						$('#btn-capture').show();
+						$('#eway-capture-amount').show();
 					}
 
-					$('#img_loading_capture').hide();
+					$('#img-loading-capture').hide();
 				}
 			});
 		}

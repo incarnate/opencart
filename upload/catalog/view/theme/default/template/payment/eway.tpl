@@ -68,30 +68,30 @@
       <?php if ($payment_type['visa'] == 1 || $payment_type['mastercard'] == 1 || $payment_type['diners'] == 1 || $payment_type['jcb'] == 1 || $payment_type['amex'] == 1) { ?>
         <div id="creditcard-info">
           <div class="form-group required">
-            <label class="col-sm-2 control-label" for="EWAY_CARDNAME"><?php echo $entry_cc_name; ?></label>
+            <label class="col-sm-2 control-label" for="eway-cardname"><?php echo $entry_cc_name; ?></label>
             <div class="col-sm-10">
-              <input name="EWAY_CARDNAME" type="text" value="" id="EWAY_CARDNAME" placeholder="<?php echo $entry_cc_name; ?>"  autocomplete="off" class="form-control"/>
+              <input name="EWAY_CARDNAME" type="text" value="" id="eway-cardname" placeholder="<?php echo $entry_cc_name; ?>"  autocomplete="off" class="form-control"/>
               <span id="ewaycard-error" class="text-danger"></span>
             </div>
           </div>
           <div class="form-group required">
-            <label class="col-sm-2 control-label" for="EWAY_CARDNUMBER"><?php echo $entry_cc_number; ?></label>
+            <label class="col-sm-2 control-label" for="eway-cardnumber"><?php echo $entry_cc_number; ?></label>
             <div class="col-sm-10">
-              <input name="EWAY_CARDNUMBER" type="text" maxlength="19" id="EWAY_CARDNUMBER" value="" placeholder="<?php echo $entry_cc_number; ?>"  autocomplete="off" class="form-control" pattern="\d*" />
+              <input name="EWAY_CARDNUMBER" type="text" maxlength="19" id="eway-cardnumber" value="" placeholder="<?php echo $entry_cc_number; ?>"  autocomplete="off" class="form-control" pattern="\d*" />
               <span id="ewaynumber-error" class="text-danger"></span>
             </div>
           </div>
           <div class="form-group required">
-            <label class="col-sm-2 control-label" for="EWAY_CARDEXPIRYMONTH"><?php echo $entry_cc_expire_date; ?></label>
+            <label class="col-sm-2 control-label" for="eway-card-expiry-month"><?php echo $entry_cc_expire_date; ?></label>
             <div class="col-sm-2">
-              <select name="EWAY_CARDEXPIRYMONTH" id="EWAY_CARDEXPIRYMONTH" class="form-control">
+              <select name="EWAY_CARDEXPIRYMONTH" id="eway-card-expiry-month" class="form-control">
                 <?php foreach ($months as $month) { ?>
                   <option value="<?php echo $month['value']; ?>"><?php echo $month['text']; ?></option>
                 <?php } ?>
               </select>
             </div>
             <div class="col-sm-2">
-              <select name="EWAY_CARDEXPIRYYEAR" id="EWAY_CARDEXPIRYYEAR" class="form-control">
+              <select name="EWAY_CARDEXPIRYYEAR" id="eway-card-expiry-year" class="form-control">
                 <?php foreach ($year_expire as $year) { ?>
                   <option value="<?php echo $year['value']; ?>"><?php echo $year['text']; ?></option>
                 <?php } ?>
@@ -99,10 +99,10 @@
             </div>
           </div>
           <div class="form-group required">
-            <label class="col-sm-2 control-label" for="EWAY_CARDCVN"><?php echo $entry_cc_cvv2; ?></label>
+            <label class="col-sm-2 control-label" for="eway-cardcvn"><?php echo $entry_cc_cvv2; ?></label>
             <div class="col-sm-10">
-              <input name="EWAY_CARDCVN" type="text" maxlength="4" value="" placeholder="<?php echo $entry_cc_cvv2; ?>" id="EWAY_CARDCVN" autocomplete="off" class="form-control" pattern="\d*" />
-              <span id="cvn_details" class="help">
+              <input name="EWAY_CARDCVN" type="text" maxlength="4" value="" placeholder="<?php echo $entry_cc_cvv2; ?>" id="eway-cardcvn" autocomplete="off" class="form-control" pattern="\d*" />
+              <span id="cvn-details" class="help">
                 <?php echo $help_cvv; ?>
                 <?php
                 if (in_array('amex', $payment_type)) {
@@ -126,29 +126,33 @@
     </div>
   </div>
 
-<script language="JavaScript" type="text/javascript" >
-  //<!--
+<script language="JavaScript" type="text/javascript" >//<!--
 	function select_eWAYPaymentOption(v) {
-		if ($("#creditcard-info").length)
+		if ($("#creditcard-info").length) {
 			$("#creditcard-info").hide();
-		if ($("#tip-paypal").length)
+		}
+		if ($("#tip-paypal").length) {
 			$("#tip-paypal").hide();
-		if ($("#tip-masterpass").length)
+		}
+		if ($("#tip-masterpass").length) {
 			$("#tip-masterpass").hide();
-		if ($("#tip-vme").length)
+		}
+		if ($("#tip-vme").length) {
 			$("#tip-vme").hide();
+		}
 		if (v == 'creditcard') {
 			$("#creditcard-info").show();
 		} else {
 			$("#tip-" + v).show();
 		}
 	}
-
+</script> 
+<script type="text/javascript">
 	$('#button-confirm').bind('click', function() {
 
-		if ($('#eway-radio-cc').is(':checked')) {
+            if ($('#eway-radio-cc').is(':checked')) {
 		var eway_error = false;
-		if ($('#EWAY_CARDNAME').val().length < 1) {
+		if ($('#eway-cardname').val().length < 1) {
 			eway_error = true;
 			$('#ewaycard-error').html('Card Holder\'s Name must be entered');
 		} else {
@@ -156,15 +160,15 @@
 		}
 
 		var ccnum_regex = new RegExp("^[0-9]{13,19}$");
-		if (!ccnum_regex.test($('#EWAY_CARDNUMBER').val().replace(/ /g, '')) || !luhn10($('#EWAY_CARDNUMBER').val())) {
+		if (!ccnum_regex.test($('#eway-cardnumber').val().replace(/ /g, '')) || !luhn10($('#eway-cardnumber').val())) {
 			eway_error = true;
 			$('#ewaynumber-error').html('Card Number appears invalid');
 		} else {
 			$('#ewaynumber-error').empty();
 		}
 
-		var cc_year = parseInt($('#EWAY_CARDEXPIRYYEAR').val(), 10);
-		var cc_month = parseInt($('#EWAY_CARDEXPIRYMONTH').val(), 10);
+		var cc_year = parseInt($('#eway-card-expiry-year').val(), 10);
+		var cc_month = parseInt($('#eway-card-expiry-month').val(), 10);
 
 		var cc_expiry = new Date(cc_year, cc_month, 1);
 		var cc_expired = new Date(cc_expiry - 1);
@@ -178,7 +182,7 @@
 		}
 
 		var ccv_regex = new RegExp("^[0-9]{3,4}$");
-		if (!ccv_regex.test($('#EWAY_CARDCVN').val().replace(/ /g, ''))) {
+		if (!ccv_regex.test($('#eway-cardcvn').val().replace(/ /g, ''))) {
 			eway_error = true;
 			$('#ewaycvn-error').html('CVV/CSV Number appears invalid');
 		} else {
@@ -191,17 +195,18 @@
 	  }
 
 	  $('#eway-payment-form').submit();
+          $('#button-confirm').button('loading');
 	  $("#button-confirm").prop('disabled', true);
 
 	});
 
 	var luhn10 = function(a, b, c, d, e) {
-		for (d = + a[b = a.length - 1], e = 0; b--; )
+		for (d = + a[b = a.length - 1], e = 0; b--; ) {
 			c = +a[b], d += ++e % 2 ? 2 * c % 10 + (c > 4) : c;
+		}
 		return !(d % 10)
 	};
 
-  //-->
-</script>
+//--></script>
 
 <?php } ?>
