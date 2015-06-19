@@ -92,12 +92,8 @@ $_['button_uninstall']              = 'Uninstall';
 $_['button_login']                  = 'Login into Store';
 $_['button_unlock']                 = 'Unlock Account';
 $_['button_link']                   = 'Link';
-$_['button_shipping']               = 'Apply Shipping Method';
-$_['button_payment']                = 'Apply Payment Method';
-$_['button_coupon']                 = 'Apply Coupon';
-$_['button_voucher']                = 'Apply Voucher';
-$_['button_reward']                 = 'Apply Points';
 $_['button_currency']               = 'Refresh Currency Values';
+$_['button_apply']                  = 'Apply';
 
 // Tab
 $_['tab_address']                   = 'Address';
@@ -109,7 +105,6 @@ $_['tab_design']                    = 'Design';
 $_['tab_discount']                  = 'Discount';
 $_['tab_general']                   = 'General';
 $_['tab_history']                   = 'History';
-$_['tab_fraud']                     = 'Fraud';
 $_['tab_ftp']                       = 'FTP';
 $_['tab_ip']                        = 'IP Addresses';
 $_['tab_links']                     = 'Links';
@@ -136,6 +131,7 @@ $_['tab_online']                    = 'People Online';
 $_['tab_activity']                  = 'Recent Activity';
 $_['tab_recurring']                 = 'Recurring';
 $_['tab_action']                    = 'Action';
+$_['tab_google']                    = 'Google';
 
 // Error
 $_['error_exception']               = 'Error Code(%s): %s in %s on line %s';
