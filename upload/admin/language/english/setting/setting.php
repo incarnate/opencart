@@ -19,6 +19,8 @@ $_['text_shipping']                    = 'Shipping Address';
 $_['text_payment']                     = 'Payment Address';
 $_['text_mail']                        = 'Mail';
 $_['text_smtp']                        = 'SMTP';
+$_['text_google_analytics']            = 'Google Analytics';
+$_['text_google_captcha']              = 'Google reCAPTCHA';
 
 // Entry
 $_['entry_name']                       = 'Store Name';
@@ -106,15 +108,11 @@ $_['entry_ftp_root']                   = 'FTP Root';
 $_['entry_ftp_status']                 = 'Enable FTP';
 $_['entry_mail_protocol']              = 'Mail Protocol';
 $_['entry_mail_parameter']             = 'Mail Parameters';
-$_['entry_smtp_hostname']              = 'SMTP Hostname';
-$_['entry_smtp_username']              = 'SMTP Username';
-$_['entry_smtp_password']              = 'SMTP Password';
-$_['entry_smtp_port']                  = 'SMTP Port';
-$_['entry_smtp_timeout']               = 'SMTP Timeout';
-$_['entry_fraud_detection']            = 'Use MaxMind Fraud Detection System';
-$_['entry_fraud_key']                  = 'MaxMind License Key';
-$_['entry_fraud_score']                = 'MaxMind Risk Score';
-$_['entry_fraud_status']               = 'MaxMind Fraud Order Status';
+$_['entry_mail_smtp_hostname']         = 'SMTP Hostname';
+$_['entry_mail_smtp_username']         = 'SMTP Username';
+$_['entry_mail_smtp_password']         = 'SMTP Password';
+$_['entry_mail_smtp_port']             = 'SMTP Port';
+$_['entry_mail_smtp_timeout']          = 'SMTP Timeout';
 $_['entry_secure']                     = 'Use SSL';
 $_['entry_shared']                     = 'Use Shared Sessions';
 $_['entry_robots']                     = 'Robots';
@@ -130,6 +128,9 @@ $_['entry_error_display']              = 'Display Errors';
 $_['entry_error_log']                  = 'Log Errors';
 $_['entry_error_filename']             = 'Error Log Filename';
 $_['entry_google_analytics']           = 'Google Analytics Code';
+$_['entry_google_captcha_public']      = 'Site key';
+$_['entry_google_captcha_secret']      = 'Secret key';
+$_['entry_status']                     = 'Status';
 
 // Help
 $_['help_geocode']                     = 'Please enter your store location geocode manually.';
@@ -181,9 +182,6 @@ $_['help_mail_protocol']               = 'Only choose \'Mail\' unless your host 
 $_['help_mail_parameter']              = 'When using \'Mail\', additional mail parameters can be added here (e.g. -f email@storeaddress.com).';
 $_['help_mail_smtp_hostname']          = 'Add \'tls://\' prefix if security connection is required. (e.g. tls://smtp.gmail.com).';
 $_['help_mail_alert']                  = 'Any additional emails you want to receive the alert email, in addition to the main store email. (comma separated).';
-$_['help_fraud_detection']             = 'MaxMind is a fraud detection service. If you don\'t have a license key you can <a href="http://www.maxmind.com/?rId=opencart" target="_blank"><u>sign up here</u></a>. Once you have obtained a key, copy and paste it into the field below.';
-$_['help_fraud_score']                 = 'The higher the score the more likely the order is fraudulent. Set a score between 0 - 100.';
-$_['help_fraud_status']                = 'Orders over your set score will be assigned this order status and will not be allowed to reach the complete status automatically.';
 $_['help_secure']                      = 'To use SSL check with your host if a SSL certificate is installed and add the SSL URL to the catalog and admin config files.';
 $_['help_shared']                      = 'Try to share the session cookie between stores so the cart can be passed between different domains.';
 $_['help_robots']                      = 'A list of web crawler user agents that shared sessions will not be used with. Use separate lines for each user agent.';
@@ -196,6 +194,7 @@ $_['help_password']                    = 'Allow forgotten password to be used fo
 $_['help_encryption']                  = 'Please provide a secret key that will be used to encrypt private information when processing orders.';
 $_['help_compression']                 = 'GZIP for more efficient transfer to requesting clients. Compression level must be between 0 - 9.';
 $_['help_google_analytics']            = 'Login to your <a href="http://www.google.com/analytics/" target="_blank"><u>Google Analytics</u></a> account and after creating your website profile copy and paste the analytics code into this field.';
+$_['help_google_captcha']              = 'Go to <a href="https://www.google.com/recaptcha/intro/index.html" target="_blank"><u>Google reCAPTCHA page</u></a> and register your website.';
 
 // Error
 $_['error_warning']                    = 'Warning: Please check the form carefully for errors!';
@@ -228,4 +227,5 @@ $_['error_ftp_port']                   = 'FTP Port required!';
 $_['error_ftp_username']               = 'FTP Username required!';
 $_['error_ftp_password']               = 'FTP Password required!';
 $_['error_error_filename']             = 'Error Log Filename required!';
+$_['error_malformed_filename']	        = 'Error Malformed Log Filename!';
 $_['error_encryption']                 = 'Encryption Key must be between 3 and 32 characters!';

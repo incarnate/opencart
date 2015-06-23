@@ -758,7 +758,7 @@ $('select[name=\'config_template\']').on('change', function() {
 			$('.fa-spin').remove();
 		},
 		success: function(html) {
-      $('.fa-spin').remove();
+			$('.fa-spin').remove();
 
 			$('#template').attr('src', html);
 		},
@@ -773,7 +773,7 @@ $('select[name=\'config_template\']').trigger('change');
   <script type="text/javascript"><!--
 $('select[name=\'config_country_id\']').on('change', function() {
 	$.ajax({
-		url: 'index.php?route=setting/store/country&token=<?php echo $token; ?>&country_id=' + this.value,
+		url: 'index.php?route=localisation/country/country&token=<?php echo $token; ?>&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
 			$('select[name=\'config_country_id\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
@@ -782,11 +782,9 @@ $('select[name=\'config_country_id\']').on('change', function() {
 			$('.fa-spin').remove();
 		},
 		success: function(json) {
-      $('.fa-spin').remove();
-
 			html = '<option value=""><?php echo $text_select; ?></option>';
 
-			if (json['zone'] != '') {
+			if (json['zone'] && json['zone'] != '') {
 				for (i = 0; i < json['zone'].length; i++) {
 					html += '<option value="' + json['zone'][i]['zone_id'] + '"';
 					

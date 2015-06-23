@@ -43,6 +43,20 @@
                 </div>
               </div>
               <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-currency"><?php echo $entry_currency; ?></label>
+                <div class="col-sm-10">
+                  <select name="currency" id="input-currency" class="form-control">
+                    <?php foreach ($currencies as $currency) { ?>
+                    <?php if ($currency['code'] == $currency_code) { ?>
+                    <option value="<?php echo $currency['code']; ?>" selected="selected"><?php echo $currency['title']; ?></option>
+                    <?php } else { ?>
+                    <option value="<?php echo $currency['code']; ?>"><?php echo $currency['title']; ?></option>
+                    <?php } ?>
+                    <?php } ?>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
                 <label class="col-sm-2 control-label" for="input-customer"><?php echo $entry_customer; ?></label>
                 <div class="col-sm-10">
                   <input type="text" name="customer" value="<?php echo $customer; ?>" placeholder="<?php echo $entry_customer; ?>" id="input-customer" class="form-control" />
@@ -96,7 +110,7 @@
               <?php foreach ($custom_fields as $custom_field) { ?>
               <?php if ($custom_field['location'] == 'account') { ?>
               <?php if ($custom_field['type'] == 'select') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <select name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" id="input-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control">
@@ -113,7 +127,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'radio') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div id="input-custom-field<?php echo $custom_field['custom_field_id']; ?>">
@@ -135,7 +149,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'checkbox') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div id="input-custom-field<?php echo $custom_field['custom_field_id']; ?>">
@@ -157,7 +171,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'text') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <input type="text" name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" value="<?php echo (isset($account_custom_field[$custom_field['custom_field_id']]) ? $account_custom_field[$custom_field['custom_field_id']] : $custom_field['value']); ?>" placeholder="<?php echo $custom_field['name']; ?>" id="input-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control" />
@@ -165,7 +179,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'textarea') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <textarea name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" rows="5" placeholder="<?php echo $custom_field['name']; ?>" id="input-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control"><?php echo $custom_field['value']; ?></textarea>
@@ -173,7 +187,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'file') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <button type="button" id="button-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="btn btn-default"><i class="fa fa-upload"></i> <?php echo $button_upload; ?></button>
@@ -182,7 +196,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'date') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group date">
@@ -194,7 +208,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'time') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group time">
@@ -206,7 +220,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'datetime') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group datetime">
@@ -465,7 +479,7 @@
               <?php foreach ($custom_fields as $custom_field) { ?>
               <?php if ($custom_field['location'] == 'address') { ?>
               <?php if ($custom_field['type'] == 'select') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <select name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" id="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control">
@@ -482,7 +496,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'radio') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div id="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>">
@@ -504,7 +518,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'checkbox') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div id="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>">
@@ -526,7 +540,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'text') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <input type="text" name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" value="<?php echo (isset($payment_custom_field[$custom_field['custom_field_id']]) ? $payment_custom_field[$custom_field['custom_field_id']] : $custom_field['value']); ?>" placeholder="<?php echo $custom_field['name']; ?>" id="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control" />
@@ -534,7 +548,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'textarea') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <textarea name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" rows="5" placeholder="<?php echo $custom_field['name']; ?>" id="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control"><?php echo (isset($payment_custom_field[$custom_field['custom_field_id']]) ? $payment_custom_field[$custom_field['custom_field_id']] : $custom_field['value']); ?></textarea>
@@ -542,7 +556,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'file') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <button type="button" id="button-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-default"><i class="fa fa-upload"></i> <?php echo $button_upload; ?></button>
@@ -551,7 +565,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'date') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group date">
@@ -563,7 +577,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'time') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group time">
@@ -575,7 +589,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'datetime') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-payment-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group datetime">
@@ -676,7 +690,7 @@
               <?php foreach ($custom_fields as $custom_field) { ?>
               <?php if ($custom_field['location'] == 'address') { ?>
               <?php if ($custom_field['type'] == 'select') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <select name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" id="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control">
@@ -693,7 +707,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'radio') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div id="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>">
@@ -715,7 +729,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'checkbox') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div id="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>">
@@ -737,7 +751,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'text') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <input type="text" name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" value="<?php echo (isset($shipping_custom_field[$custom_field['custom_field_id']]) ? $shipping_custom_field[$custom_field['custom_field_id']] : $custom_field['value']); ?>" placeholder="<?php echo $custom_field['name']; ?>" id="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control" />
@@ -745,7 +759,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'textarea') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <textarea name="custom_field[<?php echo $custom_field['custom_field_id']; ?>]" rows="5" placeholder="<?php echo $custom_field['name']; ?>" id="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>" class="form-control"><?php echo (isset($shipping_custom_field[$custom_field['custom_field_id']]) ? $shipping_custom_field[$custom_field['custom_field_id']] : $custom_field['value']); ?></textarea>
@@ -753,7 +767,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'file') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <button type="button" id="button-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-default"><i class="fa fa-upload"></i> <?php echo $button_upload; ?></button>
@@ -762,7 +776,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'date') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group date">
@@ -774,7 +788,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'time') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group time">
@@ -786,7 +800,7 @@
               </div>
               <?php } ?>
               <?php if ($custom_field['type'] == 'datetime') { ?>
-              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>">
+              <div class="form-group custom-field custom-field<?php echo $custom_field['custom_field_id']; ?>" data-sort="<?php echo $custom_field['sort_order'] + 3; ?>">
                 <label class="col-sm-2 control-label" for="input-shipping-custom-field<?php echo $custom_field['custom_field_id']; ?>"><?php echo $custom_field['name']; ?></label>
                 <div class="col-sm-10">
                   <div class="input-group datetime">
@@ -840,7 +854,7 @@
                         <?php } ?>
                       </select>
                       <span class="input-group-btn">
-                      <button type="button" id="button-shipping-method" data-toggle="tooltip" title="<?php echo $button_shipping; ?>" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><i class="fa fa-refresh"></i></button>
+                      <button type="button" id="button-shipping-method" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><?php echo $button_apply; ?></button>
                       </span></div>
                   </div>
                 </div>
@@ -855,7 +869,7 @@
                         <?php } ?>
                       </select>
                       <span class="input-group-btn">
-                      <button type="button" id="button-payment-method" data-toggle="tooltip" title="<?php echo $button_payment; ?>" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><i class="fa fa-refresh"></i></button>
+                      <button type="button" id="button-payment-method" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><?php echo $button_apply; ?></button>
                       </span></div>
                   </div>
                 </div>
@@ -865,7 +879,7 @@
                     <div class="input-group">
                       <input type="text" name="coupon" value="<?php echo $coupon; ?>" id="input-coupon" class="form-control" />
                       <span class="input-group-btn">
-                      <button type="button" id="button-coupon" data-toggle="tooltip" title="<?php echo $button_coupon; ?>" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><i class="fa fa-refresh"></i></button>
+                      <button type="button" id="button-coupon" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><?php echo $button_apply; ?></button>
                       </span></div>
                   </div>
                 </div>
@@ -875,7 +889,7 @@
                     <div class="input-group">
                       <input type="text" name="voucher" value="<?php echo $voucher; ?>" id="input-voucher" data-loading-text="<?php echo $text_loading; ?>" class="form-control" />
                       <span class="input-group-btn">
-                      <button type="button" id="button-voucher" data-toggle="tooltip" title="<?php echo $button_voucher; ?>" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><i class="fa fa-refresh"></i></button>
+                      <button type="button" id="button-voucher" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><?php echo $button_apply; ?></button>
                       </span></div>
                   </div>
                 </div>
@@ -885,7 +899,7 @@
                     <div class="input-group">
                       <input type="text" name="reward" value="<?php echo $reward; ?>" id="input-reward" data-loading-text="<?php echo $text_loading; ?>" class="form-control" />
                       <span class="input-group-btn">
-                      <button type="button" id="button-reward" data-toggle="tooltip" title="<?php echo $button_reward; ?>" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><i class="fa fa-refresh"></i></button>
+                      <button type="button" id="button-reward" data-loading-text="<?php echo $text_loading; ?>" class="btn btn-primary"><?php echo $button_apply; ?></button>
                       </span></div>
                   </div>
                 </div>
@@ -938,11 +952,41 @@
 $('#order a[data-toggle=\'tab\']').on('click', function(e) {
 	return false;
 });
+
+// test
+$.ajax({
+	url: 'http://127.0.0.1/index.php?route=sale/order/api&token=<?php echo $token; ?>&api=api/currency&store_id=' + $('select[name=\'store_id\'] option:selected').val(),
+	type: 'post',
+	data: 'currency=' + $('select[name=\'currency\'] option:selected').val(),
+	dataType: 'json',
+	beforeSend: function() {
+		$('select[name=\'currency\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+	},	
+	complete: function() {
+		$('.fa-spin').remove();
+	},		
+	success: function(json) {
+		$('.alert, .text-danger').remove();
+		$('.form-group').removeClass('has-error');
+		
+		if (json['error']) {
+			$('#content > .container-fluid').prepend('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+		
+			// Highlight any found errors
+			$('select[name=\'currency\']').parent().parent().parent().addClass('has-error');			
+		}
+	},	
+	error: function(xhr, ajaxOptions, thrownError) {
+		alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+	}
+});
+
+
 			
 // Add all products to the cart using the api
 $('#button-refresh').on('click', function() {
 	$.ajax({
-		url: 'index.php?route=sale/order/api&token=<?php echo $token; ?>&api=api/cart/products&store_id=' + $('select[name=\'store_id\'] option:selected').val(),
+		url: '127.0.0.1/admin/index.php?route=sale/order/api&token=<?php echo $token; ?>&api=api/cart/products&store_id=' + $('select[name=\'store_id\'] option:selected').val(),
 		dataType: 'json',
 		success: function(json) {
 			$('.alert-danger, .text-danger').remove();
@@ -1117,6 +1161,38 @@ $('#button-refresh').on('click', function() {
 		}
 	});
 });
+
+// Currency
+$('select[name=\'currency\']').on('change', function() {
+	$.ajax({
+		url: 'index.php?route=sale/order/api&token=<?php echo $token; ?>&api=api/currency&store_id=' + $('select[name=\'store_id\'] option:selected').val(),
+		type: 'post',
+		data: 'currency=' + $('select[name=\'currency\'] option:selected').val(),
+		dataType: 'json',
+		beforeSend: function() {
+			$('select[name=\'currency\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+		},	
+		complete: function() {
+			$('.fa-spin').remove();
+		},		
+		success: function(json) {
+			$('.alert, .text-danger').remove();
+			$('.form-group').removeClass('has-error');
+			
+			if (json['error']) {
+				$('#content > .container-fluid').prepend('<div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			
+				// Highlight any found errors
+				$('select[name=\'currency\']').parent().parent().parent().addClass('has-error');			
+			}
+		},	
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$('select[name=\'currency\']').trigger('change');
 
 // Customer
 $('input[name=\'customer\']').autocomplete({
@@ -1710,7 +1786,7 @@ var payment_zone_id = '<?php echo $payment_zone_id; ?>';
 
 $('#tab-payment select[name=\'country_id\']').on('change', function() {
 	$.ajax({
-		url: 'index.php?route=sale/order/country&token=<?php echo $token; ?>&country_id=' + this.value,
+		url: 'index.php?route=localisation/country/country&token=<?php echo $token; ?>&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
 			$('#tab-payment select[name=\'country_id\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
@@ -1727,7 +1803,7 @@ $('#tab-payment select[name=\'country_id\']').on('change', function() {
 			
 			html = '<option value=""><?php echo $text_select; ?></option>';
 
-			if (json['zone'] != '') {
+			if (json['zone'] && json['zone'] != '') {
 				for (i = 0; i < json['zone'].length; i++) {
         			html += '<option value="' + json['zone'][i]['zone_id'] + '"';
 	    			
@@ -1894,7 +1970,7 @@ var shipping_zone_id = '<?php echo $shipping_zone_id; ?>';
 
 $('#tab-shipping select[name=\'country_id\']').on('change', function() {
 	$.ajax({
-		url: 'index.php?route=sale/order/country&token=<?php echo $token; ?>&country_id=' + this.value,
+		url: 'index.php?route=localisation/country/country&token=<?php echo $token; ?>&country_id=' + this.value,
 		dataType: 'json',
 		beforeSend: function() {
 			$('#tab-shipping select[name=\'country_id\']').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
@@ -1911,7 +1987,7 @@ $('#tab-shipping select[name=\'country_id\']').on('change', function() {
 			
 			html = '<option value=""><?php echo $text_select; ?></option>';
 			
-			if (json['zone'] != '') {
+			if (json['zone'] && json['zone'] != '') {
 				for (i = 0; i < json['zone'].length; i++) {
         			html += '<option value="' + json['zone'][i]['zone_id'] + '"';
 	    			
@@ -1996,9 +2072,9 @@ $('#button-shipping-address').on('click', function() {
 									if (!json['shipping_methods'][i]['error']) {
 										for (j in json['shipping_methods'][i]['quote']) {
 											if (json['shipping_methods'][i]['quote'][j]['code'] == $('select[name=\'shipping_method\'] option:selected').val()) {
-												html += '<option value="' + json['shipping_methods'][i]['quote'][j]['code'] + '" selected="selected">' + json['shipping_methods'][i]['quote'][j]['title'] + '</option>';
+												html += '<option value="' + json['shipping_methods'][i]['quote'][j]['code'] + '" selected="selected">' + json['shipping_methods'][i]['quote'][j]['title'] + ' - ' + json['shipping_methods'][i]['quote'][j]['text'] + '</option>';
 											} else {
-												html += '<option value="' + json['shipping_methods'][i]['quote'][j]['code'] + '">' + json['shipping_methods'][i]['quote'][j]['title'] + '</option>';
+												html += '<option value="' + json['shipping_methods'][i]['quote'][j]['code'] + '">' + json['shipping_methods'][i]['quote'][j]['title'] + ' - ' + json['shipping_methods'][i]['quote'][j]['text'] + '</option>';
 											}
 										}		
 									} else {
@@ -2291,7 +2367,11 @@ $('#content').delegate('button[id^=\'button-upload\'], button[id^=\'button-custo
 	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
 
 	$('#form-upload input[name=\'file\']').trigger('click');
-
+	
+	if (typeof timer != 'undefined') {
+    	clearInterval(timer);
+	}
+	
 	timer = setInterval(function() {
 		if ($('#form-upload input[name=\'file\']').val() != '') {
 			clearInterval(timer);
@@ -2345,5 +2425,50 @@ $('.datetime').datetimepicker({
 $('.time').datetimepicker({
 	pickDate: false
 });	
-//--></script></div>
+//--></script> 
+  <script type="text/javascript">
+// Sort the custom fields
+$('#tab-customer .form-group[data-sort]').detach().each(function() {
+	if ($(this).attr('data-sort') >= 0 && $(this).attr('data-sort') <= $('#tab-customer .form-group').length) {
+		$('#tab-customer .form-group').eq($(this).attr('data-sort')).before(this);
+	}
+
+	if ($(this).attr('data-sort') > $('#tab-customer .form-group').length) {
+		$('#tab-customer .form-group:last').after(this);
+	}
+
+	if ($(this).attr('data-sort') < -$('#tab-customer .form-group').length) {
+		$('#tab-customer .form-group:first').before(this);
+	}
+});
+
+// Sort the custom fields
+$('#tab-payment .form-group[data-sort]').detach().each(function() {
+	if ($(this).attr('data-sort') >= 0 && $(this).attr('data-sort') <= $('#tab-payment .form-group').length) {
+		$('#tab-payment .form-group').eq($(this).attr('data-sort')).before(this);
+	}
+
+	if ($(this).attr('data-sort') > $('#tab-payment .form-group').length) {
+		$('#tab-payment .form-group:last').after(this);
+	}
+
+	if ($(this).attr('data-sort') < -$('#tab-payment .form-group').length) {
+		$('#tab-payment .form-group:first').before(this);
+	}
+});
+
+$('#tab-shipping .form-group[data-sort]').detach().each(function() {
+	if ($(this).attr('data-sort') >= 0 && $(this).attr('data-sort') <= $('#tab-shipping .form-group').length) {
+		$('#tab-shipping .form-group').eq($(this).attr('data-sort')).before(this);
+	}
+
+	if ($(this).attr('data-sort') > $('#tab-shipping .form-group').length) {
+		$('#tab-shipping .form-group:last').after(this);
+	}
+
+	if ($(this).attr('data-sort') < -$('#tab-shipping .form-group').length) {
+		$('#tab-shipping .form-group:first').before(this);
+	}
+});
+</script></div>
 <?php echo $footer; ?>
